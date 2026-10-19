@@ -59,6 +59,19 @@ tr.hh th{background:var(--accent);color:var(--accent-t)}
 .pa{color:#d3342d;font-weight:700}.pb{color:#2563c9;font-weight:700}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pa{color:#ff6b62}:root:not([data-theme="light"]) .pb{color:#6fa3ff}}
 :root[data-theme="dark"] .pa{color:#ff6b62}:root[data-theme="dark"] .pb{color:#6fa3ff}
+@media (max-width:520px){
+ main{padding:8px 10px 40px}.card{padding:10px}
+ header{padding:10px 10px 8px}h1{font-size:19px}
+ table{font-size:12px}th,td{padding:7px 3px}
+}
+table.sc{table-layout:fixed;font-size:12px}
+table.sc th,table.sc td{padding:5px 0;position:relative}
+table.sc th.l,table.sc td.l{width:44px;padding-left:3px;text-align:left;overflow:hidden;text-overflow:ellipsis}
+table.sc th:last-child,table.sc td:last-child{width:30px}
+table.sc .mk{min-width:18px;height:18px}
+table.sc .mk.dbl{padding:2px;min-width:22px;height:22px}
+table.sc .mk.dbl>.mk{min-width:14px;height:14px}
+table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
@@ -331,7 +344,7 @@ function holeTbl(m,from,to){
   const sum=s=>idx.reduce((t,i)=>t+(m.holes[s][i]!=null?m.holes[s][i]:0),0);
   const cell=(s,i)=>{const v=m.holes[s][i];if(v==null)return sk(s,i)?`<td style="color:var(--accent);font-size:10px;letter-spacing:1px">${"●".repeat(sk(s,i))}</td>`:`<td>·</td>`;const o=s==="a"?"b":"a",ov=m.holes[o][i];const w=ov!=null&&(v-sk(s,i))<(ov-sk(o,i));return `<td class="${w?"win":""}">${mark(v,pars[i]||4)}${sk(s,i)?`<sup>${v-sk(s,i)}</sup>`:""}</td>`};
   const row=s=>`<tr><td class="l p${s}">${nm(s==="a"?m.a:m.b)}</td>${idx.map(i=>cell(s,i)).join("")}<td><b>${sum(s)||"–"}</b></td></tr>`;
-  return `<div class="wrap"><table><tr class="hh"><th class="l">Hole</th>${idx.map(i=>`<th>${i+1}</th>`).join("")}<th>${lab}</th></tr><tr class="pr"><td class="l">Par</td>${idx.map(i=>`<td>${pars[i]||4}</td>`).join("")}<td>${idx.reduce((t,i)=>t+(pars[i]||4),0)}</td></tr>${row("a")}${row("b")}</table></div>`;
+  return `<div class="wrap"><table class="sc"><tr class="hh"><th class="l">Hole</th>${idx.map(i=>`<th>${i+1}</th>`).join("")}<th>${lab}</th></tr><tr class="pr"><td class="l">Par</td>${idx.map(i=>`<td>${pars[i]||4}</td>`).join("")}<td>${idx.reduce((t,i)=>t+(pars[i]||4),0)}</td></tr>${row("a")}${row("b")}</table></div>`;
 }
 function vLive(){
   const prog=S.matches.filter(m=>m.status==="live").sort((a,b)=>b.ts-a.ts);
