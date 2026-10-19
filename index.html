@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sim Golf League</title>
+<style>
+:root{--bg:#f4f6f1;--card:#fff;--text:#1c2a20;--muted:#6b7a70;--accent:#2f7d4f;--accent-t:#fff;--line:#dfe5dc;--warn:#b3402f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a15;--card:#1b261f;--text:#e6efe8;--muted:#8fa296;--accent:#4fb274;--accent-t:#0c150f;--line:#2b3a30;--warn:#e07a68;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121a15;--card:#1b261f;--text:#e6efe8;--muted:#8fa296;--accent:#4fb274;--accent-t:#0c150f;--line:#2b3a30;--warn:#e07a68;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif}
+header{padding:12px 16px 8px;position:sticky;top:0;background:var(--bg);z-index:20;border-bottom:1px solid var(--line)}
+.burger{order:3;margin-left:auto;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:22px;line-height:1;padding:0}
+h1{margin:0;font-size:22px}
+.sub{color:var(--muted);font-size:13px}
+nav{display:none;flex-direction:column;gap:6px;padding:10px 0 6px}nav.open{display:flex}
+nav button{width:100%;text-align:left;padding:12px 14px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;font-size:16px}
+nav button.on{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:600}
+main{padding:8px 16px 40px;max-width:720px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 10px;font-size:16px}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font-size:16px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{margin-top:12px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-t);font-size:16px;font-weight:600}
+.x{border:0;background:none;color:var(--warn);font-size:18px;padding:4px 8px}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-size:12px;font-weight:600}
+td.l,th.l{text-align:left}
+tr:last-child td{border-bottom:0}
+.rank{color:var(--muted);width:24px}
+.pts{font-weight:700;color:var(--accent)}
+.item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);gap:8px}
+.item:last-child{border-bottom:0}
+.item small{color:var(--muted);display:block}
+.win{font-weight:700;color:var(--accent)}
+.empty{color:var(--muted);text-align:center;padding:12px;font-size:14px}
+.status{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+.holes{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.hb{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:14px}
+.hb.done{background:var(--line)}.hb.cur{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:700}
+.stepper{display:flex;align-items:center;gap:14px}.stepper button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:24px}.stepper span{min-width:30px;text-align:center;font-size:28px;font-weight:700}
+.big{font-size:18px;font-weight:700}.pargrid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}.pargrid input{padding:8px 2px;text-align:center}
+.btn.alt{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--warn);margin-right:4px;animation:pl 1.2s infinite}@keyframes pl{50%{opacity:.25}}
+sup{font-size:10px;font-weight:700;color:var(--accent);margin-left:1px}td.win{background:rgba(79,178,116,.18)}td.st{position:relative}.sd{position:absolute;top:1px;left:3px;font-size:8px;line-height:1;color:var(--accent);letter-spacing:1px}
+tr.hh th{background:var(--accent);color:var(--accent-t)}
+.livebtn{background:var(--warn);color:#fff;border:0;border-radius:16px;padding:5px 12px;line-height:1.15;font-size:13px;font-weight:700;letter-spacing:.5px;animation:fl 1s infinite}@keyframes fl{50%{opacity:.35}}
+.mk{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;box-sizing:border-box;line-height:1;position:relative}
+.mk.c{border:1.5px solid var(--muted);border-radius:50%;opacity:.8}.mk.s{border:1.5px solid var(--muted);border-radius:2px;opacity:.8}.mk.c>.mk,.mk.s>.mk{opacity:1}
+.mk.dbl{padding:2px;min-width:26px;height:26px}.mk.dbl>.mk{min-width:18px;height:18px}
+.mk.tr{overflow:hidden}.mk.tr::after{content:"";position:absolute;left:-20%;width:140%;top:50%;border-top:1.5px solid var(--muted);transform:rotate(-45deg)}
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}.dlg{background:var(--card);padding:18px;border-radius:14px;max-width:340px;width:100%}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-size:14px}tr.pr td{background:var(--line);font-weight:600}
+.pa{color:#d3342d;font-weight:700}.pb{color:#2563c9;font-weight:700}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pa{color:#ff6b62}:root:not([data-theme="light"]) .pb{color:#6fa3ff}}
+:root[data-theme="dark"] .pa{color:#ff6b62}:root[data-theme="dark"] .pb{color:#6fa3ff}
+</style>
+</head>
+<body>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1>⛳ Sim Golf League</h1><span id="livebtn"></span></div><div class="sub" id="sub"></div><nav id="nav"></nav></header>
+<main id="main"></main>
+<div class="status" id="status"></div>
+<script>
+const TABS=[["standings","Standings"],["matches","Start New Match"],["players","Setup"]];
+let tab="standings",menuOpen=false;
+function toggleMenu(){menuOpen=!menuOpen;render()}
+let S={players:[],matches:[],rounds:[],settings:{format:"match",placePts:"10,8,6,4,2,1",par:72,win:2,tie:1,loss:0,name:"Sim Golf League"}};
+let dbDoc=null,saveTimer=null,lastLocal=0,dirty=false,canEdit=false;
+const PIN="0112";
+const uid=()=>Math.random().toString(36).slice(2,9);
+const today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pl=id=>S.players.find(p=>p.id===id);
+const nm=id=>pl(id)?esc(pl(id).name):"(removed)";
+
+/* ---------- persistence ---------- */
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+window.alert=toast;
+function ask(msg,yes){const o=document.createElement("div");o.className="ovl";o.innerHTML=`<div class="dlg"><div>${esc(msg)}</div><div class="row"><button class="btn alt" id="dn">Cancel</button><button class="btn" id="dy">Confirm</button></div></div>`;document.body.appendChild(o);o.querySelector("#dn").onclick=()=>o.remove();o.querySelector("#dy").onclick=()=>{o.remove();yes()}}
+function setStatus(t){document.getElementById("status").textContent=t}
+function persist(force){
+  if(!canEdit&&!force)return;
+  dirty=true;clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    lastLocal=Date.now();
+    if(dbDoc){try{await dbDoc.set(JSON.parse(JSON.stringify(S)));setStatus("Saved · live for everyone")}catch(e){setStatus("Couldn't save — check your connection")}}
+    else setStatus("Not connected yet");
+    dirty=false;
+  },300);
+}
+function load(data){if(data&&data.players){S=Object.assign({players:[],matches:[],rounds:[],courses:[],settings:S.settings},data);S.settings=Object.assign({format:"match",placePts:"10,8,6,4,2,1",par:72,win:2,tie:1,loss:0,name:"Sim Golf League"},S.settings)}}
+const SEED={"courses":[{"id":"default","name":"Generic Par 72","pars":[4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5]},{"id":"pebble","name":"Pebble Beach Golf Links","pars":[4,5,4,4,3,5,3,4,4,4,4,3,4,5,4,4,3,5],"si":[6,10,12,16,14,2,18,4,8,3,9,17,7,1,13,11,15,5]},{"id":"standrews","name":"St Andrews \u2013 Old Course","pars":[4,4,4,4,5,4,4,3,4,4,3,4,4,5,4,4,4,4],"si":[18,12,16,10,2,8,4,14,6,7,17,9,5,1,13,3,11,15]},{"id":"pinehurst2","name":"Pinehurst No. 2 (resort, par 72)","pars":[4,4,4,4,5,3,4,5,3,5,4,4,4,4,3,5,3,4],"si":[11,3,9,1,15,5,7,17,13,18,8,10,6,2,12,16,14,4]},{"id":"pinehurst2open","name":"Pinehurst No. 2 (U.S. Open, par 70)","pars":[4,4,4,4,5,3,4,4,3,5,4,4,4,4,3,4,3,4],"si":[11,3,9,1,15,5,7,17,13,18,8,10,6,2,12,16,14,4]},{"id":"augusta","name":"Augusta National Golf Club","pars":[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],"si":[9,1,13,15,5,17,11,3,7,6,8,16,4,12,2,18,14,10]},{"id":"sawgrass","name":"TPC Sawgrass \u2013 Stadium Course","pars":[4,5,3,4,4,4,4,3,5,4,5,4,3,4,4,5,3,4],"si":[11,15,17,9,3,13,1,7,5,12,8,16,18,4,6,10,14,2]},{"id":"torrey","name":"Torrey Pines \u2013 South Course","pars":[4,4,3,4,4,5,4,3,5,4,3,4,5,4,4,3,4,5],"si":[5,15,13,3,11,9,1,17,7,16,14,2,6,8,12,18,4,10]},{"id":"bethpage","name":"Bethpage Black (par 71)","pars":[4,4,3,5,4,4,5,3,4,4,4,4,5,3,4,4,3,4],"si":[7,13,17,1,3,11,9,15,5,8,10,4,6,18,2,12,14,16]},{"id":"whistling","name":"Whistling Straits \u2013 Straits Course","pars":[4,5,3,4,5,4,3,4,4,4,5,3,4,4,4,5,3,4],"si":[15,7,17,1,5,13,9,3,11,12,6,18,14,16,4,10,8,2]},{"id":"kiawah","name":"Kiawah Island \u2013 Ocean Course","pars":[4,5,4,4,3,4,5,3,4,4,5,4,4,3,4,5,3,4],"si":[15,3,9,1,11,13,7,17,5,16,8,10,2,14,18,4,12,6]}],"matches":[{"a":"p10rcdq","b":"2ebr8ih","course":"pebble","date":"2026-10-18","ha":12,"hb":22,"holes":{"a":[4,4,4,4,4,4,3,5,5,5,3,3,5,5,4,4,4,7],"b":[7,7,5,7,4,7,6,5,5,6,7,5,8,5,4,6,7,6]},"id":"pyw4pay","sa":77,"sb":107,"status":"final","ts":1792374707868,"week":""},{"a":"p10rcdq","b":"2ebr8ih","course":"standrews","date":"2026-10-19","ha":12,"hb":22,"holes":{"a":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"b":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},"id":"bjom1my","status":"live","ts":1792434703325,"week":""}],"players":[{"hcp":12,"id":"p10rcdq","name":"Reid"},{"hcp":22,"id":"2ebr8ih","name":"Tubbs"}],"rounds":[],"settings":{"format":"match","loss":0,"name":"Sim Golf League","par":72,"placePts":"10,8,6,4,2,1","tie":1,"win":2}};
+function init(){
+  try{if(localStorage.getItem("golf-pin")===PIN)canEdit=true}catch(e){}
+  load(JSON.parse(JSON.stringify(SEED)));
+  render();
+  setStatus("Connecting…");
+  setTimeout(()=>{if(!dbDoc)setStatus("Couldn't connect to the league database")},10000);
+}
+window.connectDb=function(db){
+  dbDoc=db;
+  db.onSnapshot(snap=>{
+    if(snap.exists){
+      if(!snap.pending&&!dirty&&Date.now()-lastLocal>1500){load(JSON.parse(JSON.stringify(snap.data())));const a=document.activeElement;if(!(a&&(a.tagName==="SELECT"||a.tagName==="INPUT")))render()}
+    } else persist(true);
+    setStatus("Live · updates for everyone");
+  },()=>setStatus("Can't reach the league database"));
+};
+function unlock(){
+  const o=document.createElement("div");o.className="ovl";
+  o.innerHTML=`<div class="dlg"><div>Scorekeeper PIN</div><input id="pinin" type="password" inputmode="numeric" autocomplete="off" style="margin-top:8px"><div class="row"><button class="btn alt" id="pc">Cancel</button><button class="btn" id="po">Unlock</button></div></div>`;
+  document.body.appendChild(o);
+  o.querySelector("#pc").onclick=()=>o.remove();
+  o.querySelector("#po").onclick=()=>{if(o.querySelector("#pinin").value===PIN){canEdit=true;try{localStorage.setItem("golf-pin",PIN)}catch(e){}o.remove();menuOpen=false;render()}else toast("Wrong PIN")};
+}
+function lock(){canEdit=false;try{localStorage.removeItem("golf-pin")}catch(e){}tab="standings";live=null;editFinal=false;menuOpen=false;render()}
+function mut(fn){fn();persist();render()}
+
+/* ---------- stats ---------- */
+function allRounds(){
+  const r=S.rounds.map(x=>({player:x.player,gross:x.score,date:x.date,week:x.week}));
+  S.matches.filter(m=>m.status!=="live").forEach(m=>{r.push({player:m.a,gross:m.sa,date:m.date});r.push({player:m.b,gross:m.sb,date:m.date})});
+  return r;
+}
+const hcpOf=(m,side)=>{const v=side==="a"?m.ha:m.hb;if(v!=null)return Number(v)||0;const p=pl(side==="a"?m.a:m.b);return Number(p&&p.hcp)||0};
+const nh=(m,s)=>nm(s==="a"?m.a:m.b)+` <span class="sub">(${hcpOf(m,s)})</span>`;
+function net(m,side){const h=hcpOf(m,side);return (side==="a"?m.sa:m.sb)-h}
+function baseStats(){
+  const T={};
+  S.players.forEach(p=>T[p.id]={id:p.id,w:0,l:0,t:0,pts:0,rounds:0,sum:0,best:null});
+  allRounds().forEach(r=>{const t=T[r.player];if(!t)return;t.rounds++;t.sum+=r.gross;t.best=t.best==null?r.gross:Math.min(t.best,r.gross)});
+  Object.values(T).forEach(t=>{const h=Number(pl(t.id).hcp)||0;t.avg=t.rounds?t.sum/t.rounds:null;t.netAvg=t.rounds?t.avg-h:null});
+  return T;
+}
+function strokeStandings(){
+  return Object.values(baseStats()).sort((a,b)=>(a.netAvg==null)-(b.netAvg==null)||a.netAvg-b.netAvg);
+}
+function pointsStandings(){
+  const T=baseStats(),pts=String(S.settings.placePts||"").split(",").map(x=>parseFloat(x)||0);
+  const weeks={};
+  S.rounds.forEach(r=>{if(r.week){(weeks[r.week]=weeks[r.week]||[]).push({p:r.player,n:r.score-(Number(pl(r.player)?.hcp)||0)})}});
+  Object.values(weeks).forEach(list=>{
+    list.sort((a,b)=>a.n-b.n);
+    list.forEach((e,i)=>{const place=list.findIndex(x=>x.n===e.n);const t=T[e.p];if(!t)return;t.pts+=pts[place]||0;if(place===0)t.w++});
+  });
+  return Object.values(T).sort((a,b)=>b.pts-a.pts||b.w-a.w||(a.netAvg==null)-(b.netAvg==null)||a.netAvg-b.netAvg);
+}
+function standings(){
+  if(S.settings.format==="stroke")return strokeStandings();
+  if(S.settings.format==="points")return pointsStandings();
+  const T={};
+  S.players.forEach(p=>T[p.id]={id:p.id,w:0,l:0,t:0,pts:0,rounds:0,sum:0,best:null});
+  S.matches.forEach(m=>{
+    const a=T[m.a],b=T[m.b];if(!a||!b||m.status==="live")return;
+    const rs=mres(m),c=S.settings;
+    if(rs<0){a.w++;b.l++;a.pts+=c.win;b.pts+=c.loss}
+    else if(rs>0){b.w++;a.l++;b.pts+=c.win;a.pts+=c.loss}
+    else{a.t++;b.t++;a.pts+=c.tie;b.pts+=c.tie}
+  });
+  allRounds().forEach(r=>{const t=T[r.player];if(!t)return;t.rounds++;t.sum+=r.gross;t.best=t.best==null?r.gross:Math.min(t.best,r.gross)});
+  return Object.values(T).sort((x,y)=>y.pts-x.pts||y.w-x.w||(x.rounds&&y.rounds?x.sum/x.rounds-y.sum/y.rounds:0));
+}
+const fmtTop=n=>n==null?"–":n;
+const rel=(s)=>{const d=s-S.settings.par;return d===0?"E":d>0?"+"+d:String(d)};
+
+/* ---------- views ---------- */
+function playerOpts(sel){return S.players.map(p=>`<option value="${p.id}" ${p.id===sel?"selected":""}>${esc(p.name)}</option>`).join("")}
+function needPlayers(){return `<div class="card empty">Add at least two players first.</div>`}
+
+function vStandingsAlt(st){
+  const f=S.settings.format,f1=v=>v==null?"–":v.toFixed(1);
+  if(f==="stroke")return `<div class="card"><h2>Stroke Play Standings</h2><div class="wrap"><table><tr><th></th><th class="l">Player</th><th>Net Avg</th><th>Avg</th><th>Best</th><th>Total</th><th>Rds</th></tr>${st.map((t,i)=>`<tr><td class="rank">${i+1}</td><td class="l">${nm(t.id)}</td><td class="pts">${f1(t.netAvg)}</td><td>${f1(t.avg)}</td><td>${fmtTop(t.best)}</td><td>${t.sum||"–"}</td><td>${t.rounds}</td></tr>`).join("")}</table></div><div class="sub" style="margin-top:8px">Ranked by lowest average net score (gross − handicap).</div></div>`;
+  return `<div class="card"><h2>Weekly Points Standings</h2><div class="wrap"><table><tr><th></th><th class="l">Player</th><th>Pts</th><th>Wks Won</th><th>Avg</th><th>Best</th><th>Rds</th></tr>${st.map((t,i)=>`<tr><td class="rank">${i+1}</td><td class="l">${nm(t.id)}</td><td class="pts">${t.pts}</td><td>${t.w}</td><td>${f1(t.avg)}</td><td>${fmtTop(t.best)}</td><td>${t.rounds}</td></tr>`).join("")}</table></div><div class="sub" style="margin-top:8px">Each week (rounds logged with the same Week #) players are ranked by net score and earn points by finish: ${esc(S.settings.placePts)}.</div></div>`;
+}
+function vStandings(){
+  const st=standings(),SK=skinsMap(),P=t=>t.w*10+t.t*5+(SK[t.id]||0);if(S.settings.format==="match")st.sort((a,b)=>P(b)-P(a)||b.w-a.w);
+  if(st.length&&S.settings.format!=="match")return vStandingsAlt(st);
+  if(!st.length)return `<div class="card empty">No players yet. Add some in the Players tab.</div>`;
+  return `<div class="card"><h2>League Standings</h2><div class="wrap"><table>
+  <tr><th></th><th class="l">Player</th><th>Pts</th><th>W</th><th>L</th><th>T</th><th>Skins</th><th>Avg</th><th>Best</th><th>Rds</th></tr>
+  ${st.map((t,i)=>`<tr><td class="rank">${i+1}</td><td class="l">${nm(t.id)}</td><td class="pts">${P(t)}</td><td>${t.w}</td><td>${t.l}</td><td>${t.t}</td><td>${SK[t.id]||0}</td><td>${t.rounds?(t.sum/t.rounds).toFixed(1):"–"}</td><td>${fmtTop(t.best)}</td><td>${t.rounds}</td></tr>`).join("")}
+  </table></div><div class="sub" style="margin-top:8px">Points: 10 per win, 5 per tie, 1 per skin. Skins = holes won outright on net score (hole-by-hole matches).</div></div>`;
+}
+
+let live=null,curHole=0,editFinal=false;
+const course=id=>S.courses.find(c=>c.id===id);
+const cname=m=>course(m.course)?course(m.course).name:(m.course||"");
+function strokesFor(m,pid,i){const ha=hcpOf(m,"a"),hb=hcpOf(m,"b"),h=Math.max(0,(pid===m.a?ha:hb)-Math.min(ha,hb)),n=m.holes.a.length,eff=n===18?h:Math.round(h/2),c=course(m.course),si=(c&&c.si)||Array.from({length:18},(_,k)=>k+1);const rank=si.slice(0,n).map((s,k)=>[s,k]).sort((a,b)=>a[0]-b[0]).findIndex(x=>x[1]===i);return Math.floor(eff/n)+(rank<eff%n?1:0)}
+function holesWon(m){let wa=0,wb=0,n=0;m.holes.a.forEach((x,i)=>{const y=m.holes.b[i];if(x!=null&&y!=null){n++;const nx=x-strokesFor(m,m.a,i),ny=y-strokesFor(m,m.b,i);if(nx<ny)wa++;else if(ny<nx)wb++}});return{wa,wb,n}}
+function skinsMap(){const K={};S.matches.forEach(m=>{if(!m.holes||m.status==="live")return;const r=holesWon(m);K[m.a]=(K[m.a]||0)+r.wa;K[m.b]=(K[m.b]||0)+r.wb});return K}
+function mres(m){if(m.holes){const r=holesWon(m);return r.wa>r.wb?-1:r.wb>r.wa?1:0}const na=net(m,"a"),nb=net(m,"b");return na<nb?-1:nb<na?1:0}
+function statusText(m){const r=holesWon(m),d=r.wa-r.wb,who=nm(d>0?m.a:m.b);if(!r.n)return "Not started";if(m.status==="live")return d===0?"All square thru "+r.n:`${who} ${Math.abs(d)} UP thru ${r.n}`;const mr=matchResult(m);return mr.w?`${nm(mr.w==="a"?m.a:m.b)} won ${mr.t}`:"AS"}
+const scoreName=d=>d<=-2?"Eagle":d===-1?"Birdie":d===0?"Par":d===1?"Bogey":"+"+d;
+function newMatch(){
+  const g=id=>document.getElementById(id).value;
+  const a=g("na"),b=g("nb");if(a===b)return alert("Pick two different players.");
+  const base={id:uid(),a,b,ha:Number(pl(a).hcp)||0,hb:Number(pl(b).hcp)||0,course:g("nc"),date:g("nd")||today(),week:"",ts:Date.now()};
+  if(g("nm")==="quick"){const sa=parseInt(g("nsa")),sb=parseInt(g("nsb"));if(!(sa>0)||!(sb>0))return alert("Enter both scores.");mut(()=>S.matches.push({...base,sa,sb}));return}
+  const n=+g("nh");
+  mut(()=>{S.matches.push({...base,status:"live",holes:{a:Array(n).fill(null),b:Array(n).fill(null)}});live=base.id;curHole=0});
+}
+function bump(id,side,d){const m=S.matches.find(x=>x.id===id);const par=((course(m.course)||{}).pars||[])[curHole]||4;mut(()=>{let v=m.holes[side][curHole];m.holes[side][curHole]=v==null?par:Math.max(1,v+d);if(m.status!=="live"){const sm=s=>m.holes[s].reduce((t,x,i)=>t+(m.holes.a[i]!=null&&m.holes.b[i]!=null?x:0),0);m.sa=sm("a");m.sb=sm("b")}})}
+function goHole(d){curHole+=d;render()}
+function finishMatch(id){const m=S.matches.find(x=>x.id===id);const r=holesWon(m);const go=()=>mut(()=>{const sum=s=>m.holes[s].reduce((t,x,i)=>t+(m.holes.a[i]!=null&&m.holes.b[i]!=null?x:0),0);m.sa=sum("a");m.sb=sum("b");m.status="final";live=null;if(editFinal){editFinal=false;tab="standings"}});if(r.n<m.holes.a.length)ask(`Only ${r.n} of ${m.holes.a.length} holes scored. Finish anyway?`,go);else go()}
+function addCourse(){const n=document.getElementById("cn").value.trim();if(!n)return alert("Name the course.");const pars=Array.from({length:18},(_,i)=>parseInt(document.getElementById("cp"+i).value)||4);const si=Array.from({length:18},(_,i)=>parseInt(document.getElementById("ci"+i).value)||i+1);mut(()=>S.courses.push({id:uid(),name:n,pars,si}))}
+const PRESETS=[
+{id:"pebble",name:"Pebble Beach Golf Links",pars:[4,5,4,4,3,5,3,4,4,4,4,3,4,5,4,4,3,5],si:[6,10,12,16,14,2,18,4,8,3,9,17,7,1,13,11,15,5]},
+{id:"standrews",name:"St Andrews – Old Course",pars:[4,4,4,4,5,4,4,3,4,4,3,4,4,5,4,4,4,4],si:[18,12,16,10,2,8,4,14,6,7,17,9,5,1,13,3,11,15]},
+{id:"pinehurst2",name:"Pinehurst No. 2 (resort, par 72)",pars:[4,4,4,4,5,3,4,5,3,5,4,4,4,4,3,5,3,4],si:[11,3,9,1,15,5,7,17,13,18,8,10,6,2,12,16,14,4]},
+{id:"pinehurst2open",name:"Pinehurst No. 2 (U.S. Open, par 70)",pars:[4,4,4,4,5,3,4,4,3,5,4,4,4,4,3,4,3,4],si:[11,3,9,1,15,5,7,17,13,18,8,10,6,2,12,16,14,4]},
+{id:"augusta",name:"Augusta National Golf Club",pars:[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4],si:[9,1,13,15,5,17,11,3,7,6,8,16,4,12,2,18,14,10]},
+{id:"sawgrass",name:"TPC Sawgrass – Stadium Course",pars:[4,5,3,4,4,4,4,3,5,4,5,4,3,4,4,5,3,4],si:[11,15,17,9,3,13,1,7,5,12,8,16,18,4,6,10,14,2]},
+{id:"torrey",name:"Torrey Pines – South Course",pars:[4,4,3,4,4,5,4,3,5,4,3,4,5,4,4,3,4,5],si:[5,15,13,3,11,9,1,17,7,16,14,2,6,8,12,18,4,10]},
+{id:"bethpage",name:"Bethpage Black (par 71)",pars:[4,4,3,5,4,4,5,3,4,4,4,4,5,3,4,4,3,4],si:[7,13,17,1,3,11,9,15,5,8,10,4,6,18,2,12,14,16]},
+{id:"whistling",name:"Whistling Straits – Straits Course",pars:[4,5,3,4,5,4,3,4,4,4,5,3,4,4,4,5,3,4],si:[15,7,17,1,5,13,9,3,11,12,6,18,14,16,4,10,8,2]},
+{id:"kiawah",name:"Kiawah Island – Ocean Course",pars:[4,5,4,4,3,4,5,3,4,4,5,4,4,3,4,5,3,4],si:[15,3,9,1,11,13,7,17,5,16,8,10,2,14,18,4,12,6]}];
+function addPreset(ids){mut(()=>ids.forEach(id=>{if(!S.courses.some(c=>c.id===id)){const p=PRESETS.find(x=>x.id===id);S.courses.push({id:p.id,name:p.name,pars:[...p.pars],si:[...p.si]})}}))}
+function delCourse(id){if(S.courses.length<2)return alert("Keep at least one course.");ask("Delete this course?",()=>mut(()=>S.courses=S.courses.filter(c=>c.id!==id)))}
+function vScorecard(m){
+  const c=course(m.course),n=m.holes.a.length,par=(c&&c.pars[curHole])||4;
+  const tot=s=>m.holes[s].reduce((t,x,i)=>t+(m.holes.a[i]!=null&&m.holes.b[i]!=null?x:0),0);
+  const row=(side,id)=>{const v=m.holes[side][curHole],sk=strokesFor(m,id,curHole);return `<div class="item"><div style="flex:1"><b>${nm(id)}</b><small>${v==null?"Tap + to score":scoreName(v-par)}${sk?" · gets "+sk+" stroke"+(sk>1?"s":""):""}</small></div><div class="stepper"><button onclick="bump('${m.id}','${side}',-1)">−</button><span>${v==null?"–":v}</span><button onclick="bump('${m.id}','${side}',1)">+</button></div></div>`};
+  return `<div class="card"><div class="big">${nm(m.a)} vs ${nm(m.b)}</div><div class="sub">${esc(cname(m)||"No course")} · ${n} holes</div><div class="big" style="color:var(--accent);margin-top:6px">${statusText(m)}</div>
+  <div class="holes">${m.holes.a.map((x,i)=>`<button class="hb ${i===curHole?"cur":""} ${x!=null&&m.holes.b[i]!=null?"done":""}" onclick="curHole=${i};render()">${i+1}</button>`).join("")}</div></div>
+  <div class="card"><h2>Hole ${curHole+1} · Par ${par}</h2>${row("a",m.a)}${row("b",m.b)}
+  <div class="row"><button class="btn alt" ${curHole===0?"disabled":""} onclick="goHole(-1)">← Prev</button><button class="btn" ${curHole>=n-1?"disabled":""} onclick="goHole(1)">Next →</button></div>
+  <div class="sub" style="margin-top:10px">Totals (scored holes): ${nm(m.a)} ${tot("a")} · ${nm(m.b)} ${tot("b")}</div></div>
+  <button class="btn" onclick="finishMatch('${m.id}')">${m.status==="live"?"Finish Match":"Save Changes"}</button><button class="btn alt" onclick="exitCard()">${editFinal?"Close":"Back to matches"}</button>`;
+}
+function vMatches(){
+  if(S.players.length<2)return needPlayers();
+  const lm=live&&S.matches.find(m=>m.id===live&&(m.status==="live"||editFinal));
+  if(lm)return vScorecard(lm);
+  const prog=S.matches.filter(m=>m.status==="live"),done=S.matches.filter(m=>m.status!=="live").sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts);
+  const sub=m=>`${m.date}${m.week?" · Week "+esc(m.week):""}${cname(m)?" · "+esc(cname(m)):""}`;
+  return `<div class="card"><h2>New Match</h2>
+  <div class="row"><div><label>Player A</label><select id="na">${playerOpts()}</select></div><div><label>Player B</label><select id="nb">${playerOpts(S.players[1].id)}</select></div></div>
+  <label>Course</label><select id="nc">${S.courses.map(c=>`<option value="${c.id}">${esc(c.name)} (par ${c.pars.reduce((a,b)=>a+b,0)})</option>`).join("")}</select>
+  <div class="row"><div><label>Date</label><input id="nd" type="date" value="${today()}"></div></div>
+  <div class="row"><div><label>Scoring</label><select id="nm" onchange="document.getElementById('qk').style.display=this.value==='quick'?'flex':'none';document.getElementById('nhw').style.display=this.value==='quick'?'none':'block'"><option value="holes">Hole by hole</option><option value="quick">Enter final scores</option></select></div><div id="nhw"><label>Holes</label><select id="nh"><option value="18">18</option><option value="9">9</option></select></div></div>
+  <div class="row" id="qk" style="display:none"><div><label>A gross score</label><input id="nsa" type="number" inputmode="numeric"></div><div><label>B gross score</label><input id="nsb" type="number" inputmode="numeric"></div></div>
+  <button class="btn" onclick="newMatch()">Start Match</button></div>
+  ${prog.length?`<div class="card"><h2>In Progress</h2>${prog.map(m=>`<div class="item"><div>${nh(m,"a")} vs ${nh(m,"b")}<small>${statusText(m)} · ${sub(m)}</small></div><div><button class="x" style="color:var(--accent)" onclick="live='${m.id}';curHole=0;render()">Resume</button><button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button></div></div>`).join("")}</div>`:""}
+  ${vWeekly("Match History")||`<div class="card"><h2>Match History</h2><div class="empty">No matches yet.</div></div>`}`;
+}
+function vMatchesOld(){
+  if(S.players.length<2)return needPlayers();
+  const rows=[...S.matches].sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).map(m=>{
+    const na=net(m,"a"),nb=net(m,"b");
+    return `<div class="item"><div><span class="${na<nb?"win":""}">${nm(m.a)} ${m.sa}</span> vs <span class="${nb<na?"win":""}">${nm(m.b)} ${m.sb}</span>
+    <small>${m.date}${m.week?" · Week "+esc(m.week):""}${m.course?" · "+esc(m.course):""}${na===nb?" · Tied (net)":""}</small></div><button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button></div>`}).join("");
+  return `<div class="card"><h2>Record a Match</h2>
+  <div class="row"><div><label>Player A</label><select id="ma">${playerOpts()}</select></div><div><label>Player B</label><select id="mb">${playerOpts(S.players[1].id)}</select></div></div>
+  <div class="row"><div><label>A gross score</label><input id="msa" type="number" inputmode="numeric" min="1"></div><div><label>B gross score</label><input id="msb" type="number" inputmode="numeric" min="1"></div></div>
+  <div class="row"><div><label>Date</label><input id="md" type="date" value="${today()}"></div><div><label>Week #</label><input id="mw" inputmode="numeric" placeholder="optional"></div></div>
+  <label>Course (optional)</label><input id="mc" placeholder="e.g. Pebble Beach">
+  <button class="btn" onclick="addMatch()">Save Match</button></div>
+  <div class="card"><h2>Match History</h2>${rows||`<div class="empty">No matches yet.</div>`}</div>`;
+}
+function addMatch(){
+  const g=id=>document.getElementById(id).value;
+  const a=g("ma"),b=g("mb"),sa=parseInt(g("msa")),sb=parseInt(g("msb"));
+  if(a===b)return alert("Pick two different players.");
+  if(!(sa>0)||!(sb>0))return alert("Enter both scores.");
+  mut(()=>S.matches.push({id:uid(),a,b,sa,sb,date:g("md")||today(),week:g("mw"),course:g("mc"),ts:Date.now()}));
+}
+function delMatch(id){ask("Delete this match?",()=>mut(()=>S.matches=S.matches.filter(m=>m.id!==id)))}
+
+const openSc={};
+function matchResult(m){let d=0;const n=m.holes.a.length;for(let i=0;i<n;i++){const x=m.holes.a[i],y=m.holes.b[i];if(x==null||y==null)continue;const nx=x-strokesFor(m,m.a,i),ny=y-strokesFor(m,m.b,i);if(nx<ny)d++;else if(ny<nx)d--;const rem=n-(i+1);if(Math.abs(d)>rem)return{w:d>0?"a":"b",t:Math.abs(d)+"&"+rem}}return{w:d>0?"a":d<0?"b":null,t:d===0?"AS":Math.abs(d)+" UP"}}
+function netTot(m,s){if(!m.holes)return net(m,s);return (s==="a"?m.sa:m.sb)-hcpOf(m,s)}
+function editCard(id){live=id;editFinal=true;curHole=0;tab="matches";render();window.scrollTo(0,0)}
+function exitCard(){const was=editFinal;live=null;editFinal=false;if(was)tab="standings";render()}
+function setMatchCourse(id,v){const m=S.matches.find(x=>x.id===id);if(m){m.course=v;persist();render()}}
+function vWeekly(title){
+  const done=S.matches.filter(m=>m.status!=="live");
+  if(!done.length)return "";
+  const G={};
+  done.forEach(m=>{const k=m.week?"Week "+m.week:m.date;(G[k]=G[k]||[]).push(m)});
+  const keys=Object.keys(G).sort((a,b)=>{const A=G[a][0],B=G[b][0];return A.week&&B.week?(parseFloat(B.week)||0)-(parseFloat(A.week)||0):B.date.localeCompare(A.date)});
+  const blk=m=>{
+    let res;
+    if(m.holes){const r=matchResult(m);res=r.w?`<span class="win">${nm(r.w==="a"?m.a:m.b)}</span> won ${r.t}`:"AS"}
+    else{const x=mres(m);res=x===0?"AS":`<span class="win">${nm(x<0?m.a:m.b)}</span> won (net)`}
+    const pLine=s=>`<div class="item" style="padding:4px 0"><b class="p${s}">${nh(m,s)}</b><span>${m.holes?"Skins <b>"+(s==="a"?holesWon(m).wa:holesWon(m).wb)+"</b> · ":""}Gross <b>${s==="a"?m.sa:m.sb}</b> · Net <b>${netTot(m,s)}</b></span></div>`;
+    const n=m.holes?m.holes.a.length:0;
+    const det=m.holes?`<details ${openSc[m.id]?"open":""} ontoggle="openSc['${m.id}']=this.open"><summary class="sub" style="cursor:pointer;margin-top:4px">View scorecard</summary>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) · ● = handicap stroke (hole not scored yet) · small number = net score on a stroke hole<br>${MARKKEY}</div>${canEdit?`<button class="btn alt" onclick="editCard('${m.id}')">Edit scorecard</button>`:""}</details>`:"";
+    return `<div class="card" style="margin:8px 0 0"><div style="display:flex;justify-content:space-between;align-items:center"><div class="big" style="font-size:16px">${res}</div>${title&&canEdit?`<button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button>`:""}</div><div class="sub">${esc(cname(m)||"No course")}</div>${pLine("a")}${pLine("b")}${det}</div>`};
+  return `<div><h2 style="margin:4px 0 0;font-size:16px">${title||"Match Results"}</h2>${keys.map(k=>{const ms=G[k].sort((a,b)=>a.ts-b.ts);return `<div class="sub" style="margin:12px 0 0;font-weight:700">${esc(k)}${G[k][0].week?" · "+G[k][0].date:""}</div>`+ms.map(blk).join("")}).join("")}</div>`;
+}
+function vWeeklyOld(){
+  const done=S.matches.filter(m=>m.status!=="live");
+  if(!done.length)return "";
+  const G={};
+  done.forEach(m=>{const k=m.week?String(m.week):"";(G[k]=G[k]||[]).push(m)});
+  const keys=Object.keys(G).sort((a,b)=>a===""?1:b===""?-1:(parseFloat(b)||0)-(parseFloat(a)||0));
+  return `<div class="card"><h2>Weekly Results</h2>${keys.map(k=>{
+    const ms=G[k].sort((a,b)=>a.ts-b.ts);
+    return `<div class="sub" style="margin:12px 0 2px;font-weight:700">${k?"Week "+esc(k):"No week assigned"} · ${ms[0].date}</div>`+ms.map(m=>{
+      const r=mres(m),res=m.holes?statusText(m):`${m.sa}–${m.sb} (net ${net(m,"a")}–${net(m,"b")})${r===0?" · Tied":""}`;
+      return `<div class="item"><div><span class="${r<0?"win":""}">${nm(m.a)}</span> vs <span class="${r>0?"win":""}">${nm(m.b)}</span><small>${res}${cname(m)?" · "+esc(cname(m)):""}</small></div><div class="sub">${r===0?"Halved":"Won: "+nm(r<0?m.a:m.b)}</div></div>`}).join("")}).join("")}</div>`;
+}
+function logRoundCard(){
+  if(!S.players.length)return "";
+  const rs=[...S.rounds].sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).slice(0,10);
+  return `<div class="card"><h2>Log a Round</h2><label>Player</label><select id="rp">${playerOpts()}</select>
+  <div class="row"><div><label>Score</label><input id="rs" type="number" inputmode="numeric" min="1"></div><div><label>Week #</label><input id="rw" inputmode="numeric" placeholder="${S.settings.format==="points"?"required for points":"optional"}"></div></div><label>Date</label><input id="rd" type="date" value="${today()}">
+  <button class="btn" onclick="addRound()">Save Round</button></div>
+  ${rs.length?`<div class="card"><h2>Recent Rounds</h2>${rs.map(r=>`<div class="item"><div>${nm(r.player)} — <b>${r.score}</b><small>${r.date}${r.week?" · Week "+esc(r.week):""}</small></div><button class="x" onclick="delRound('${r.id}')" aria-label="Delete">✕</button></div>`).join("")}</div>`:""}`;
+}
+function mark(v,par){const d=v-par;
+  if(d<=-2)return `<span class="mk c dbl"><span class="mk c">${v}</span></span>`;
+  if(d===-1)return `<span class="mk c">${v}</span>`;
+  if(d===1)return `<span class="mk s">${v}</span>`;
+  if(d===2)return `<span class="mk s dbl"><span class="mk s">${v}</span></span>`;
+  if(d>=3)return `<span class="mk s tr">${v}</span>`;
+  return `<span class="mk">${v}</span>`;
+}
+const MARKKEY="Gross markings: circle = birdie, double circle = eagle, square = bogey, double square = double bogey, slashed square = triple or worse";
+function holeTbl(m,from,to){
+  const pars=(course(m.course)||{}).pars||[],idx=[];
+  for(let i=from;i<to&&i<m.holes.a.length;i++)idx.push(i);
+  if(!idx.length)return "";
+  const lab=from===0?(m.holes.a.length>9?"Out":"Tot"):"In";
+  const sk=(s,i)=>strokesFor(m,s==="a"?m.a:m.b,i);
+  const sum=s=>idx.reduce((t,i)=>t+(m.holes[s][i]!=null?m.holes[s][i]:0),0);
+  const cell=(s,i)=>{const v=m.holes[s][i];if(v==null)return sk(s,i)?`<td style="color:var(--accent);font-size:10px;letter-spacing:1px">${"●".repeat(sk(s,i))}</td>`:`<td>·</td>`;const o=s==="a"?"b":"a",ov=m.holes[o][i];const w=ov!=null&&(v-sk(s,i))<(ov-sk(o,i));return `<td class="${w?"win":""}">${mark(v,pars[i]||4)}${sk(s,i)?`<sup>${v-sk(s,i)}</sup>`:""}</td>`};
+  const row=s=>`<tr><td class="l p${s}">${nm(s==="a"?m.a:m.b)}</td>${idx.map(i=>cell(s,i)).join("")}<td><b>${sum(s)||"–"}</b></td></tr>`;
+  return `<div class="wrap"><table><tr class="hh"><th class="l">Hole</th>${idx.map(i=>`<th>${i+1}</th>`).join("")}<th>${lab}</th></tr><tr class="pr"><td class="l">Par</td>${idx.map(i=>`<td>${pars[i]||4}</td>`).join("")}<td>${idx.reduce((t,i)=>t+(pars[i]||4),0)}</td></tr>${row("a")}${row("b")}</table></div>`;
+}
+function vLive(){
+  const prog=S.matches.filter(m=>m.status==="live").sort((a,b)=>b.ts-a.ts);
+  const fin=[];
+  const card=(m,live)=>{
+    const r=holesWon(m),n=m.holes.a.length,tot=s=>m.holes[s].reduce((t,x)=>t+(x!=null?x:0),0);
+    const pRow=(s,w)=>{const d=s==="a"?r.wa-r.wb:r.wb-r.wa;return `<div class="item"><div><b class="p${s}">${nh(m,s)}</b><small>${w} skin${w===1?"":"s"} won · ${tot(s)||"–"} strokes</small></div><div class="big" style="color:${d>0?"var(--accent)":d<0?"var(--warn)":"var(--text)"}">${d>0?"▲ "+d+" UP":d<0?"▼ "+(-d)+" DOWN":"AS"}</div></div>`};
+    return `<div class="card"><div class="sub">${live?'<span class="dot"></span>LIVE':"FINAL"} · ${esc(cname(m)||"No course")} · ${n} holes · ${m.date}${m.week?" · Week "+esc(m.week):""}</div>
+    <div class="big" style="color:var(--accent);margin:6px 0 2px">${statusText(m)}</div><div class="sub">Thru ${r.n} of ${n}</div>
+    ${pRow("a",r.wa)}${pRow("b",r.wb)}${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}
+    <div class="sub" style="margin-top:6px">Green = hole won (net) · ● = handicap stroke (hole not scored yet) · small number = net score on a stroke hole<br>${MARKKEY}</div>${live&&canEdit?`<button class="btn alt" style="color:var(--warn)" onclick="delMatch('${m.id}')">Delete this match</button>`:""}</div>`;
+  };
+  return `<button class="btn alt" style="margin:0 0 12px" onclick="tab='standings';render()">← Back to standings</button>`+(prog.length?prog.map(m=>card(m,true)).join(""):`<div class="card empty">No matches in progress right now.<br>Start one from the Matches tab.</div>`)
+    +(fin.length?`<h2 style="font-size:16px;margin:16px 0 8px">Recent Finals</h2>`+fin.map(m=>card(m,false)).join(""):"");
+}
+function vScores(){
+  if(!S.players.length)return `<div class="card empty">Add players first.</div>`;
+  const log=[...S.rounds.map(r=>({...r,src:"r"})),...S.matches.filter(m=>m.status!=="live").flatMap(m=>[{id:m.id,player:m.a,score:m.sa,date:m.date,ts:m.ts,src:"m"},{id:m.id,player:m.b,score:m.sb,date:m.date,ts:m.ts,src:"m"}])]
+    .sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).slice(0,60);
+  const per=S.players.map(p=>{const r=allRounds().filter(x=>x.player===p.id);return {p,r}}).filter(x=>x.r.length);
+  return `<div class="card"><h2>Log a Round</h2>
+  <label>Player</label><select id="rp">${playerOpts()}</select>
+  <div class="row"><div><label>Score</label><input id="rs" type="number" inputmode="numeric" min="1"></div><div><label>Week #</label><input id="rw" inputmode="numeric" placeholder="${S.settings.format==="points"?"required for points":"optional"}"></div></div><label>Date</label><input id="rd" type="date" value="${today()}">
+  <button class="btn" onclick="addRound()">Save Round</button>
+  <div class="sub" style="margin-top:8px">Match scores are included automatically. Par is ${S.settings.par}.</div></div>
+  <div class="card"><h2>Player Averages</h2>${per.length?`<div class="wrap"><table><tr><th class="l">Player</th><th>Avg</th><th>Best</th><th>Last</th><th>Rds</th></tr>${per.map(({p,r})=>{const s=r.reduce((a,x)=>a+x.gross,0)/r.length;const last=[...r].sort((a,b)=>b.date.localeCompare(a.date))[0].gross;return `<tr><td class="l">${esc(p.name)}</td><td>${s.toFixed(1)} (${rel(Math.round(s))})</td><td>${Math.min(...r.map(x=>x.gross))}</td><td>${last}</td><td>${r.length}</td></tr>`}).join("")}</table></div>`:`<div class="empty">No scores yet.</div>`}</div>
+  <div class="card"><h2>Recent Scores</h2>${log.map(l=>`<div class="item"><div>${nm(l.player)} — <b>${l.score}</b> (${rel(l.score)})<small>${l.date}${l.src==="m"?" · match":""}</small></div>${l.src==="r"?`<button class="x" onclick="delRound('${l.id}')" aria-label="Delete">✕</button>`:""}</div>`).join("")||`<div class="empty">Nothing logged.</div>`}</div>`;
+}
+function addRound(){
+  const s=parseInt(document.getElementById("rs").value);
+  if(!(s>0))return alert("Enter a score.");
+  mut(()=>S.rounds.push({id:uid(),player:document.getElementById("rp").value,score:s,date:document.getElementById("rd").value||today(),week:document.getElementById("rw").value.trim(),ts:Date.now()}));
+}
+function delRound(id){mut(()=>S.rounds=S.rounds.filter(r=>r.id!==id))}
+
+function vPlayers(){
+  const c=S.settings;
+  return `<div class="card"><h2>Add Player</h2>
+  <div class="row"><div style="flex:2"><label>Name</label><input id="pn"></div><div><label>Handicap</label><input id="ph" type="number" inputmode="numeric" value="0"></div></div>
+  <button class="btn" onclick="addPlayer()">Add Player</button></div>
+  <div class="card"><h2>Roster</h2>${S.players.map(p=>`<div class="item"><div>${esc(p.name)}</div><div style="display:flex;align-items:center;gap:6px"><span class="sub">Hcp</span><input type="number" inputmode="numeric" style="width:64px;padding:8px" value="${p.hcp||0}" onchange="setHcp('${p.id}',this.value)"><button class="x" onclick="delPlayer('${p.id}')" aria-label="Remove">✕</button></div></div>`).join("")||`<div class="empty">No players yet.</div>`}</div>
+  <div class="card"><h2>Course Library</h2>${PRESETS.map(p=>`<div class="item"><div>${esc(p.name)}<small>Par ${p.pars.reduce((a,b)=>a+b,0)} · 18 holes</small></div>${S.courses.some(c=>c.id===p.id)?`<span class="sub">Added</span>`:`<button class="x" style="color:var(--accent)" onclick="addPreset(['${p.id}'])">Add</button>`}</div>`).join("")}<button class="btn" onclick="addPreset(PRESETS.map(p=>p.id))">Add All</button></div>
+  <div class="card"><h2>Courses</h2>${S.courses.map(c=>`<div class="item"><div>${esc(c.name)}<small>Par ${c.pars.reduce((a,b)=>a+b,0)} · 18 holes</small></div><button class="x" onclick="delCourse('${c.id}')" aria-label="Delete course">✕</button></div>`).join("")}
+  <label>Add a course</label><input id="cn" placeholder="Course name"><label>Par by hole (1–18)</label><div class="pargrid">${Array.from({length:18},(_,i)=>`<input id="cp${i}" type="number" inputmode="numeric" value="4" aria-label="Hole ${i+1} par">`).join("")}</div><label>Stroke index (1 = hardest hole, used for handicap strokes)</label><div class="pargrid">${Array.from({length:18},(_,i)=>`<input id="ci${i}" type="number" inputmode="numeric" value="${i+1}" aria-label="Hole ${i+1} stroke index">`).join("")}</div><button class="btn" onclick="addCourse()">Add Course</button></div>
+  <div class="card"><h2>League Settings</h2>
+  <label>Competition format</label><select onchange="setS('format',this.value)"><option value="match" ${c.format==="match"?"selected":""}>Match Play (head-to-head)</option><option value="stroke" ${c.format==="stroke"?"selected":""}>Stroke Play (lowest net average)</option><option value="points" ${c.format==="points"?"selected":""}>Weekly Stroke Play + Points</option></select>
+  <label>League name</label><input id="sn" value="${esc(c.name)}" onchange="setS('name',this.value)">
+  <label>Course par</label><input type="number" value="${c.par}" onchange="setS('par',+this.value)">
+  ${false?`<div class="row"><div><label>Win pts</label><input type="number" value="${c.win}" onchange="setS('win',+this.value)"></div><div><label>Tie pts</label><input type="number" value="${c.tie}" onchange="setS('tie',+this.value)"></div><div><label>Loss pts</label><input type="number" value="${c.loss}" onchange="setS('loss',+this.value)"></div></div>`:""}
+  ${c.format==="points"?`<label>Points by finish (1st, 2nd, 3rd…)</label><input value="${esc(c.placePts)}" onchange="setS('placePts',this.value)">`:""}</div>`;
+}
+function addPlayer(){
+  const n=document.getElementById("pn").value.trim();if(!n)return;
+  mut(()=>S.players.push({id:uid(),name:n,hcp:parseInt(document.getElementById("ph").value)||0}));
+}
+function setHcp(id,v){const p=pl(id);if(p){p.hcp=parseInt(v)||0;persist()}}
+function editHcp(id){const p=pl(id);const v=prompt("Handicap for "+p.name,p.hcp||0);if(v!==null&&!isNaN(parseInt(v)))mut(()=>p.hcp=parseInt(v))}
+function delPlayer(id){ask("Remove player and all their matches and rounds?",()=>mut(()=>{S.players=S.players.filter(p=>p.id!==id);S.matches=S.matches.filter(m=>m.a!==id&&m.b!==id);S.rounds=S.rounds.filter(r=>r.player!==id)}))}
+function setS(k,v){S.settings[k]=v;persist();render(true)}
+
+function render(keepFocus){
+  if(!canEdit&&(tab==="matches"||tab==="players"))tab="standings";
+  if((tab==="matches"||tab==="live")&&S.settings.format!=="match")tab="standings";
+  const hasLive=S.settings.format==="match"&&S.matches.some(m=>m.status==="live");
+  if(tab==="live"&&!hasLive)tab="standings";
+  document.getElementById("livebtn").innerHTML=hasLive?`<button class="livebtn" onclick="tab='live';menuOpen=false;render()">● LIVE MATCH<span style="display:block;font-size:10px;font-weight:600;letter-spacing:0">click here to follow</span></button>`:"";
+  if(!S.courses||!S.courses.length)S.courses=[{id:"default",name:"Generic Par 72",pars:[4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5]}];
+  document.getElementById("sub").textContent=S.settings.name+" · "+({match:"Match Play",stroke:"Stroke Play",points:"Weekly Points"}[S.settings.format]||"");
+  document.title=S.settings.name;
+  document.getElementById("nav").className=menuOpen?"open":"";document.getElementById("hb").setAttribute("aria-expanded",menuOpen?"true":"false");
+  document.getElementById("nav").innerHTML=TABS.filter(([k])=>k==="standings"||(canEdit&&(k!=="matches"||S.settings.format==="match"))).map(([k,l])=>`<button class="${k===tab?"on":""}" onclick="tab='${k}';menuOpen=false;render()">${l}</button>`).join("")+`<button onclick="${canEdit?"lock()":"unlock()"}">${canEdit?"Lock scorekeeper mode":"Scorekeeper login"}</button>`;
+  const a=document.activeElement;
+  if(keepFocus&&a&&a.tagName==="INPUT")return;
+  document.getElementById("main").innerHTML={standings:()=>vStandings()+(S.settings.format!=="match"?(canEdit?logRoundCard():""):vWeekly()),matches:vMatches,live:vLive,players:vPlayers}[tab]();
+}
+init();
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getFirestore,doc,setDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDsnP0cAUk15EoOMSh7liJcBPRiQooLxa0",
+  authDomain: "sim-golf-league.firebaseapp.com",
+  projectId: "sim-golf-league",
+  storageBucket: "sim-golf-league.firebasestorage.app",
+  messagingSenderId: "498498923181",
+  appId: "1:498498923181:web:8fe1b0e3d7868df461f424"
+};
+const app=initializeApp(firebaseConfig);
+const ref=doc(getFirestore(app),"league","state");
+window.connectDb({
+  set:d=>setDoc(ref,d),
+  onSnapshot:(cb,err)=>onSnapshot(ref,s=>cb({exists:s.exists(),data:()=>s.data(),pending:s.metadata.hasPendingWrites}),err)
+});
+</script>
+</body>
+</html>
