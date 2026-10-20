@@ -75,12 +75,20 @@ table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1>⛳ Sim Golf League</h1><span id="livebtn"></span></div><div class="sub" id="sub"></div><nav id="nav"></nav></header>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1>⛳ Sim Golf League</h1><span id="livebtn"></span></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
 <main id="main"></main>
 <div class="status" id="status"></div>
 <script>
 const TABS=[["standings","Standings"],["matches","Start New Match"],["players","Setup"]];
 let tab="standings",menuOpen=false;
+function returnToScoring(){
+  const m=S.matches.find(x=>x.id===live&&x.status==="live")||S.matches.find(x=>x.status==="live");
+  if(!m)return;
+  live=m.id;editFinal=false;tab="matches";menuOpen=false;
+  const i=m.holes.a.findIndex((x,k)=>x==null||m.holes.b[k]==null);
+  curHole=i<0?m.holes.a.length-1:i;
+  render();window.scrollTo(0,0);
+}
 function toggleMenu(){menuOpen=!menuOpen;render()}
 let S={players:[],matches:[],rounds:[],settings:{format:"match",placePts:"10,8,6,4,2,1",par:72,win:2,tie:1,loss:0,name:"Sim Golf League"}};
 let dbDoc=null,saveTimer=null,lastLocal=0,dirty=false,canEdit=false;
@@ -409,6 +417,8 @@ function render(keepFocus){
   if(!canEdit&&(tab==="matches"||tab==="players"))tab="standings";
   if((tab==="matches"||tab==="live")&&S.settings.format!=="match")tab="standings";
   const hasLive=S.settings.format==="match"&&S.matches.some(m=>m.status==="live");
+  const scoringNow=tab==="matches"&&live&&S.matches.some(m=>m.id===live&&(m.status==="live"||editFinal));
+  document.getElementById("ret").innerHTML=(canEdit&&hasLive&&!scoringNow)?`<button class="btn" style="margin:8px 0 0;padding:9px" onclick="returnToScoring()">\u25b6 Return to scoring</button>`:"";
   if(tab==="live"&&!hasLive)tab="standings";
   document.getElementById("livebtn").innerHTML=hasLive?`<button class="livebtn" onclick="tab='live';menuOpen=false;render()">● LIVE MATCH<span style="display:block;font-size:10px;font-weight:600;letter-spacing:0">click here to follow</span></button>`:"";
   if(!S.courses||!S.courses.length)S.courses=[{id:"default",name:"Generic Par 72",pars:[4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5]}];
