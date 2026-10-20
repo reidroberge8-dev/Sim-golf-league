@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="icon-512.png">
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
+.livenow{display:inline-block;background:#e5484d;color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:99px;margin-right:6px;animation:lnp 1.2s infinite}@keyframes lnp{50%{opacity:.45}}
 :root{--bg:#f4f6f1;--card:#fff;--text:#1c2a20;--muted:#6b7a70;--accent:#2f7d4f;--accent-t:#fff;--line:#dfe5dc;--warn:#b3402f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a15;--card:#1b261f;--text:#e6efe8;--muted:#8fa296;--accent:#4fb274;--accent-t:#0c150f;--line:#2b3a30;--warn:#e07a68;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#121a15;--card:#1b261f;--text:#e6efe8;--muted:#8fa296;--accent:#4fb274;--accent-t:#0c150f;--line:#2b3a30;--warn:#e07a68;color-scheme:dark}
@@ -302,19 +303,21 @@ function editCard(id){live=id;editFinal=true;curHole=0;tab="matches";render();wi
 function exitCard(){const was=editFinal;live=null;editFinal=false;if(was)tab="standings";render()}
 function setMatchCourse(id,v){const m=S.matches.find(x=>x.id===id);if(m){m.course=v;persist();render()}}
 function vWeekly(title){
-  const done=S.matches.filter(m=>m.status!=="live");
+  const done=S.matches.filter(m=>title?m.status!=="live":true);
   if(!done.length)return "";
   const G={};
   done.forEach(m=>{const k=m.week?"Week "+m.week:m.date;(G[k]=G[k]||[]).push(m)});
   const keys=Object.keys(G).sort((a,b)=>{const A=G[a][0],B=G[b][0];return A.week&&B.week?(parseFloat(B.week)||0)-(parseFloat(A.week)||0):B.date.localeCompare(A.date)});
   const blk=m=>{
     let res;
-    if(m.holes){const r=matchResult(m);res=r.w?`<span class="win">${nm(r.w==="a"?m.a:m.b)}</span> won ${r.t}`:"AS"}
+    const isLive=m.status==="live";
+    if(isLive){res=`<span class="livenow">\u25cf LIVE NOW</span> ${statusText(m)}`}
+    else if(m.holes){const r=matchResult(m);res=r.w?`<span class="win">${nm(r.w==="a"?m.a:m.b)}</span> won ${r.t}`:"AS"}
     else{const x=mres(m);res=x===0?"AS":`<span class="win">${nm(x<0?m.a:m.b)}</span> won (net)`}
     const pLine=s=>`<div class="item" style="padding:4px 0"><b class="p${s}">${nh(m,s)}</b><span>${m.holes?"Skins <b>"+(s==="a"?holesWon(m).wa:holesWon(m).wb)+"</b> · ":""}Gross <b>${s==="a"?m.sa:m.sb}</b> · Net <b>${netTot(m,s)}</b></span></div>`;
     const n=m.holes?m.holes.a.length:0;
-    const det=m.holes?`<details ${openSc[m.id]?"open":""} ontoggle="openSc['${m.id}']=this.open"><summary class="sub" style="cursor:pointer;margin-top:4px">View scorecard</summary>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) · ● = handicap stroke (hole not scored yet) · small number = net score on a stroke hole<br>${MARKKEY}</div>${canEdit?`<button class="btn alt" onclick="editCard('${m.id}')">Edit scorecard</button>`:""}</details>`:"";
-    return `<div class="card" style="margin:8px 0 0"><div style="display:flex;justify-content:space-between;align-items:center"><div class="big" style="font-size:16px">${res}</div>${title&&canEdit?`<button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button>`:""}</div><div class="sub">${esc(cname(m)||"No course")}</div>${pLine("a")}${pLine("b")}${det}</div>`};
+    const det=m.holes?`<details ${openSc[m.id]?"open":""} ontoggle="openSc['${m.id}']=this.open"><summary class="sub" style="cursor:pointer;margin-top:4px">View scorecard</summary>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) · ● = handicap stroke (hole not scored yet) · small number = net score on a stroke hole<br>${MARKKEY}</div>${canEdit&&!isLive?`<button class="btn alt" onclick="editCard('${m.id}')">Edit scorecard</button>`:""}</details>`:"";
+    return `<div class="card" style="margin:8px 0 0;${isLive?"border-color:#e5484d":""}"><div style="display:flex;justify-content:space-between;align-items:center"><div class="big" style="font-size:16px">${res}</div>${title&&canEdit?`<button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button>`:""}</div><div class="sub">${esc(cname(m)||"No course")}</div>${pLine("a")}${pLine("b")}${det}</div>`};
   return `<div><h2 style="margin:4px 0 0;font-size:16px">${title||"Match Results"}</h2>${keys.map(k=>{const ms=G[k].sort((a,b)=>a.ts-b.ts);return `<div class="sub" style="margin:12px 0 0;font-weight:700">${esc(k)}${G[k][0].week?" · "+G[k][0].date:""}</div>`+ms.map(blk).join("")}).join("")}</div>`;
 }
 function vWeeklyOld(){
