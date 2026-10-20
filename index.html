@@ -8,6 +8,13 @@
 <link rel="icon" type="image/png" href="icon-512.png">
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
+.chatbtn{background:var(--accent);color:var(--accent-t);border:0;border-radius:16px;padding:6px 12px;font-size:13px;font-weight:700}.chatbtn b{background:var(--warn);color:#fff;border-radius:99px;padding:1px 7px;margin-left:5px;font-size:11px}
+#msgs{max-height:55vh;overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px}
+.msg{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:14px;word-wrap:break-word}.msg small{color:var(--muted);font-size:11px;margin-left:6px}.msg.me{border-color:var(--accent)}
+.msg.birdie{border-left:4px solid #2f7d4f}.msg.eagle{border-left:4px solid #d89a1c;background:rgba(216,154,28,.12)}.msg.bad{border-left:4px solid var(--warn);background:rgba(224,70,50,.1)}
+.msg .del{float:right;border:0;background:none;color:var(--muted);font-size:14px}
+.toast.big2{max-width:90vw;text-align:center;font-weight:700;background:var(--warn);color:#fff}
+
 .livenow{display:inline-block;background:#e5484d;color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:99px;margin-right:6px;animation:lnp 1.2s infinite}@keyframes lnp{50%{opacity:.45}}
 :root{--bg:#f4f6f1;--card:#fff;--text:#1c2a20;--muted:#6b7a70;--accent:#2f7d4f;--accent-t:#fff;--line:#dfe5dc;--warn:#b3402f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a15;--card:#1b261f;--text:#e6efe8;--muted:#8fa296;--accent:#4fb274;--accent-t:#0c150f;--line:#2b3a30;--warn:#e07a68;color-scheme:dark}}
@@ -79,11 +86,11 @@ table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1>⛳ Sim Golf League</h1><span id="livebtn"></span></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1>⛳ Sim Golf League</h1><span id="livebtn"></span><span id="chatbtn"></span></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
 <main id="main"></main>
 <div class="status" id="status"></div>
 <script>
-const TABS=[["standings","Standings"],["matches","Start New Match"],["players","Setup"]];
+const TABS=[["standings","Standings"],["chat","\ud83d\udcac Trash Talk"],["matches","Start New Match"],["players","Setup"]];
 let tab="standings",menuOpen=false;
 function returnToScoring(){
   const m=S.matches.find(x=>x.id===live&&x.status==="live")||S.matches.find(x=>x.status==="live");
@@ -229,7 +236,7 @@ function newMatch(){
   const n=+g("nh");
   mut(()=>{S.matches.push({...base,status:"live",holes:{a:Array(n).fill(null),b:Array(n).fill(null)}});live=base.id;curHole=0});
 }
-function bump(id,side,d){const m=S.matches.find(x=>x.id===id);const par=((course(m.course)||{}).pars||[])[curHole]||4;mut(()=>{let v=m.holes[side][curHole];m.holes[side][curHole]=v==null?par:Math.max(1,v+d);if(m.status!=="live"){const sm=s=>m.holes[s].reduce((t,x,i)=>t+(m.holes.a[i]!=null&&m.holes.b[i]!=null?x:0),0);m.sa=sm("a");m.sb=sm("b")}})}
+function bump(id,side,d){const m=S.matches.find(x=>x.id===id);const par=((course(m.course)||{}).pars||[])[curHole]||4;mut(()=>{let v=m.holes[side][curHole];m.holes[side][curHole]=v==null?par:Math.max(1,v+d);if(m.status!=="live"){const sm=s=>m.holes[s].reduce((t,x,i)=>t+(m.holes.a[i]!=null&&m.holes.b[i]!=null?x:0),0);m.sa=sm("a");m.sb=sm("b")}});if(m.status==="live")scheduleAuto(m.id,side,curHole)}
 function goHole(d){curHole+=d;render()}
 function finishMatch(id){const m=S.matches.find(x=>x.id===id);const r=holesWon(m);const go=()=>mut(()=>{const sum=s=>m.holes[s].reduce((t,x,i)=>t+(m.holes.a[i]!=null&&m.holes.b[i]!=null?x:0),0);m.sa=sum("a");m.sb=sum("b");m.status="final";live=null;if(editFinal){editFinal=false;tab="standings"}});if(r.n<m.holes.a.length)ask(`Only ${r.n} of ${m.holes.a.length} holes scored. Finish anyway?`,go);else go()}
 function addCourse(){const n=document.getElementById("cn").value.trim();if(!n)return alert("Name the course.");const pars=Array.from({length:18},(_,i)=>parseInt(document.getElementById("cp"+i).value)||4);const si=Array.from({length:18},(_,i)=>parseInt(document.getElementById("ci"+i).value)||i+1);mut(()=>S.courses.push({id:uid(),name:n,pars,si}))}
@@ -432,16 +439,94 @@ function render(keepFocus){
   document.getElementById("sub").textContent=S.settings.name+" · "+({match:"Match Play",stroke:"Stroke Play",points:"Weekly Points"}[S.settings.format]||"");
   document.title=S.settings.name;
   document.getElementById("nav").className=menuOpen?"open":"";document.getElementById("hb").setAttribute("aria-expanded",menuOpen?"true":"false");
-  document.getElementById("nav").innerHTML=TABS.filter(([k])=>k==="standings"||(canEdit&&(k!=="matches"||S.settings.format==="match"))).map(([k,l])=>`<button class="${k===tab?"on":""}" onclick="tab='${k}';menuOpen=false;render()">${l}</button>`).join("")+`<button onclick="${canEdit?"lock()":"unlock()"}">${canEdit?"Lock scorekeeper mode":"Scorekeeper login"}</button>`;
+  document.getElementById("nav").innerHTML=TABS.filter(([k])=>k==="standings"||k==="chat"||(canEdit&&(k!=="matches"||S.settings.format==="match"))).map(([k,l])=>`<button class="${k===tab?"on":""}" onclick="tab='${k}';menuOpen=false;render()">${l}</button>`).join("")+`<button onclick="${canEdit?"lock()":"unlock()"}">${canEdit?"Lock scorekeeper mode":"Scorekeeper login"}</button>`;
+  chatBadge();
   const a=document.activeElement;
   if(keepFocus&&a&&a.tagName==="INPUT")return;
-  document.getElementById("main").innerHTML={standings:()=>vStandings()+(S.settings.format!=="match"?(canEdit?logRoundCard():""):vWeekly()),matches:vMatches,live:vLive,players:vPlayers}[tab]();
+  document.getElementById("main").innerHTML={standings:()=>vStandings()+(S.settings.format!=="match"?(canEdit?logRoundCard():""):vWeekly()),matches:vMatches,live:vLive,players:vPlayers,chat:vChat}[tab]();
 }
+/* ---------- trash talk chat ---------- */
+let CH={},chatDb=null,chatReady=false,chatErr=false,chatDraft="",lastSend=0,autoT={};
+let chatName="",chatSeen=0;
+try{chatName=localStorage.getItem("golf-chat-name")||"";chatSeen=+localStorage.getItem("golf-chat-seen")||0}catch(e){}
+function chatList(){return Object.entries(CH).map(([id,m])=>Object.assign({id},m)).sort((a,b)=>a.ts-b.ts)}
+function chatUnread(){return chatList().filter(m=>m.ts>chatSeen&&!(m.k==="user"&&m.n===chatName)).length}
+function chatBadge(){
+  const el=document.getElementById("chatbtn");if(!el)return;
+  if(tab==="chat"){const l=chatList();if(l.length){chatSeen=l[l.length-1].ts;try{localStorage.setItem("golf-chat-seen",chatSeen)}catch(e){}}}
+  const u=tab==="chat"?0:chatUnread();
+  el.innerHTML=tab==="chat"?"":`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()">💬 Trash Talk${u?"<b>"+u+"</b>":""}</button>`;
+}
+function fmtT(ts){const d=new Date(ts),t=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});return d.toDateString()===new Date().toDateString()?t:d.toLocaleDateString([],{month:"short",day:"numeric"})+" "+t}
+function msgsHtml(){
+  const l=chatList().slice(-150);
+  if(chatErr)return `<div class="empty">Chat isn't enabled yet — the database rules need one small update.</div>`;
+  if(!chatReady)return `<div class="empty">Connecting…</div>`;
+  if(!l.length)return `<div class="empty">No messages yet. Say something brave.</div>`;
+  return l.map(m=>`<div class="msg ${m.k&&m.k!=="user"?m.k:""} ${m.k==="user"&&m.n===chatName?"me":""}">${canEdit?`<button class="del" onclick="chatDelete('${m.id}')" aria-label="Delete">✕</button>`:""}${m.k==="user"?`<b>${esc(m.n)}</b>`:""}<small>${fmtT(m.ts)}</small><div>${esc(m.t)}</div></div>`).join("");
+}
+function vChat(){
+  const nameBox=chatName?`<div class="sub">Chatting as <b>${esc(chatName)}</b> · <a href="#" onclick="chatChangeName();return false" style="color:var(--accent)">change name</a></div>
+  <div id="msgs">${msgsHtml()}</div>
+  <div class="row"><input id="cmsg" maxlength="280" placeholder="Talk your trash…" value="${esc(chatDraft)}" oninput="chatDraft=this.value" onkeydown="if(event.key==='Enter')sendChat()" style="flex:1"><button class="btn" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="sendChat()">Send</button></div>`
+  :`<div class="sub">Type your name to join the trash talk.</div><div class="row"><input id="cname" maxlength="24" placeholder="Your name" onkeydown="if(event.key==='Enter')joinChat()" style="flex:1"><button class="btn" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="joinChat()">Join</button></div><div id="msgs">${msgsHtml()}</div>`;
+  setTimeout(()=>{const e=document.getElementById("msgs");if(e)e.scrollTop=e.scrollHeight},0);
+  return `<div class="card"><h2>💬 Trash Talk</h2>${nameBox}</div>`;
+}
+function joinChat(){const v=document.getElementById("cname").value.trim().slice(0,24);if(!v)return toast("Enter a name");chatName=v;try{localStorage.setItem("golf-chat-name",v)}catch(e){}render()}
+function chatChangeName(){chatName="";try{localStorage.removeItem("golf-chat-name")}catch(e){}render()}
+function chatSave(id,obj){if(!chatDb)return toast("Chat isn't connected yet");return chatDb.save({msgs:{[id]:obj}}).catch(()=>{chatErr=true;chatRefresh();toast("Couldn't send — chat not enabled")})}
+function chatDelete(id){if(chatDb)chatDb.del(id).catch(()=>{})}
+function sendChat(){
+  const e=document.getElementById("cmsg");const t=(e.value||"").trim();if(!t)return;
+  if(Date.now()-lastSend<1500)return toast("Slow down, tough guy");
+  lastSend=Date.now();const ts=Date.now();
+  chatSave(ts+"-"+Math.random().toString(36).slice(2,6),{n:chatName,t:t.slice(0,280),ts,k:"user"});
+  e.value="";chatDraft="";
+}
+function chatRefresh(){
+  chatBadge();
+  if(tab==="chat"){const e=document.getElementById("msgs");if(e){const stick=e.scrollHeight-e.scrollTop-e.clientHeight<80;e.innerHTML=msgsHtml();if(stick)e.scrollTop=e.scrollHeight}}
+}
+function announce(m){
+  if(m.k&&m.k!=="user"){const t=document.createElement("div");t.className="toast big2";t.textContent=m.t;document.body.appendChild(t);setTimeout(()=>t.remove(),5500)}
+  else if(tab!=="chat")toast("💬 "+m.n+": "+m.t.slice(0,80));
+}
+window.connectChat=function(db){
+  chatDb=db;
+  db.onSnapshot(snap=>{
+    const d=snap.exists?(snap.data().msgs||{}):{};
+    if(chatReady)Object.keys(d).forEach(id=>{if(!CH[id]){const m=d[id];if(!(m.k==="user"&&m.n===chatName))announce(m)}});
+    CH=d;chatReady=true;chatErr=false;chatRefresh();
+    if(canEdit){const ks=Object.keys(d);if(ks.length>400){ks.sort((a,b)=>d[a].ts-d[b].ts).slice(0,100).forEach(chatDelete)}}
+  },()=>{chatErr=true;chatRefresh()});
+};
+function scheduleAuto(mid,side,hole){
+  const key="auto-"+mid+"-"+side+"-"+hole;clearTimeout(autoT[key]);
+  autoT[key]=setTimeout(()=>autoCheck(mid,side,hole,key),2500);
+}
+function autoCheck(mid,side,hole,key){
+  const m=S.matches.find(x=>x.id===mid);if(!m||!m.holes||m.status!=="live")return;
+  const v=m.holes[side][hole],c=course(m.course),par=((c||{}).pars||[])[hole]||4;
+  let k=null,t="";
+  if(v!=null){
+    const d=v-par,who=nm(side==="a"?m.a:m.b),opp=nm(side==="a"?m.b:m.a),h=hole+1;
+    if(v===1&&par>=3){k="eagle";t=`🎯 HOLE IN ONE!!! ${who} aces hole ${h} (Par ${par}). ${opp} just watched history.`}
+    else if(d<=-2){k="eagle";t=`🦅 EAGLE! ${who} makes a ${v} on hole ${h} (Par ${par}). ${opp}, your move.`}
+    else if(d===-1){k="birdie";t=`🐦 BIRDIE! ${who} sinks a ${v} on hole ${h} (Par ${par}). ${opp}, feeling the heat?`}
+    else if(d>=3){k="bad";t=`🚨 ${d===3?"TRIPLE BOGEY":d===4?"QUADRUPLE BOGEY":"+"+d+" DISASTER"} ALERT: ${who} posts a ${v} on hole ${h} (Par ${par}). Ouch.`}
+  }
+  const ex=CH[key];
+  if(!k){if(ex)chatDelete(key);return}
+  if(ex&&ex.t===t)return;
+  chatSave(key,{n:"Scorekeeper",t,ts:ex?ex.ts:Date.now(),k});
+}
+
 init();
 </script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getFirestore,doc,setDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,setDoc,onSnapshot,deleteField} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyDsnP0cAUk15EoOMSh7liJcBPRiQooLxa0",
   authDomain: "sim-golf-league.firebaseapp.com",
@@ -451,10 +536,17 @@ const firebaseConfig = {
   appId: "1:498498923181:web:8fe1b0e3d7868df461f424"
 };
 const app=initializeApp(firebaseConfig);
-const ref=doc(getFirestore(app),"league","state");
+const fdb=getFirestore(app);
+const ref=doc(fdb,"league","state");
+const cref=doc(fdb,"league","chat");
 window.connectDb({
   set:d=>setDoc(ref,d),
   onSnapshot:(cb,err)=>onSnapshot(ref,s=>cb({exists:s.exists(),data:()=>s.data(),pending:s.metadata.hasPendingWrites}),err)
+});
+window.connectChat({
+  save:d=>setDoc(cref,d,{merge:true}),
+  del:id=>setDoc(cref,{msgs:{[id]:deleteField()}},{merge:true}),
+  onSnapshot:(cb,err)=>onSnapshot(cref,s=>cb({exists:s.exists(),data:()=>s.data()}),err)
 });
 </script>
 </body>
