@@ -255,6 +255,7 @@ function vScorecard(m){
   <div class="card"><h2>Hole ${curHole+1} · Par ${par}</h2>${row("a",m.a)}${row("b",m.b)}
   <div class="row"><button class="btn alt" ${curHole===0?"disabled":""} onclick="goHole(-1)">← Prev</button><button class="btn" ${curHole>=n-1?"disabled":""} onclick="goHole(1)">Next →</button></div>
   <div class="sub" style="margin-top:10px">Totals (scored holes): ${nm(m.a)} ${tot("a")} · ${nm(m.b)} ${tot("b")}</div></div>
+  <div class="card"><h2>Scorecard</h2>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) \u00b7 \u25cf = handicap stroke \u00b7 small number = net score</div></div>
   <button class="btn" onclick="finishMatch('${m.id}')">${m.status==="live"?"Finish Match":"Save Changes"}</button><button class="btn alt" onclick="exitCard()">${editFinal?"Close":"Back to matches"}</button>`;
 }
 function vMatches(){
