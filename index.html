@@ -29,6 +29,7 @@ body.chatmode .lvrow{flex:0 0 auto}
 .chatbtn .dots{display:inline-flex;gap:3px;background:rgba(255,255,255,.22);border-radius:10px;padding:6px 7px}.chatbtn .dots i{width:5px;height:5px;border-radius:50%;background:currentColor;animation:dt 1.2s infinite}.chatbtn .dots i:nth-child(2){animation-delay:.2s}.chatbtn .dots i:nth-child(3){animation-delay:.4s}
 @keyframes dt{0%,60%,100%{opacity:.4;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
 .chatbtn .t1{display:block;font-size:13px;font-weight:800;letter-spacing:.3px}.chatbtn .t2{display:block;font-size:10px;font-weight:600;opacity:.9}
+.chatbtn.closebtn{background:#6b7280}.chatbtn .x{font-size:15px;font-weight:800;width:24px;height:24px;line-height:24px;text-align:center;background:rgba(255,255,255,.22);border-radius:50%}
 .chatbtn b{position:absolute;top:-7px;right:-7px;background:var(--warn);color:#fff;border-radius:99px;min-width:20px;height:20px;line-height:20px;text-align:center;font-size:11px;padding:0 5px;box-shadow:0 0 0 2px var(--bg)}
 #msgs{height:min(50vh,420px);overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}#msgs>:first-child{margin-top:auto}
 .bub{max-width:80%;display:flex;flex-direction:column}.bub.me{align-self:flex-end;align-items:flex-end}.bub.them{align-self:flex-start;align-items:flex-start}
@@ -478,14 +479,15 @@ let chatName="",chatSeen=0;
 try{chatName=localStorage.getItem("golf-chat-name")||"";chatSeen=+localStorage.getItem("golf-chat-seen")||0}catch(e){}
 function chatList(){return Object.entries(CH).map(([id,m])=>Object.assign({id},m)).sort((a,b)=>a.ts-b.ts)}
 function chatUnread(){return chatList().filter(m=>m.ts>chatSeen&&!(m.k==="user"&&m.n===chatName)).length}
-let prevTab="",chatFresh=false;
+let prevTab="",chatFresh=false,chatFrom="standings";
+function closeChat(){tab=chatFrom||"standings";menuOpen=false;render();window.scrollTo(0,0)}
 function scrollMsgs(){const e=document.getElementById("msgs");if(e)e.scrollTop=e.scrollHeight}
 function chatBadge(){
   const el=document.getElementById("chatbtn");if(!el)return;
-  if(tab==="chat"&&prevTab!=="chat")chatFresh=true;prevTab=tab;if(tab==="chat"){const nb=document.getElementById("ntf");if(nb)nb.innerHTML=""}
+  if(tab==="chat"&&prevTab!=="chat"){chatFresh=true;chatFrom=(prevTab&&prevTab!=="chat")?prevTab:"standings"}prevTab=tab;if(tab==="chat"){const nb=document.getElementById("ntf");if(nb)nb.innerHTML=""}
   if(tab==="chat"){const l=chatList();if(l.length){chatSeen=l[l.length-1].ts;try{localStorage.setItem("golf-chat-seen",chatSeen)}catch(e){}}}
   const u=tab==="chat"?0:chatUnread();
-  el.innerHTML=tab==="chat"?"":`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()"><span class="dots"><i></i><i></i><i></i></span><span><span class="t1">Trash Talk</span><span class="t2">Open chat ›</span></span>${u?"<b>"+u+"</b>":""}</button>`;
+  el.innerHTML=tab==="chat"?`<button class="chatbtn closebtn" onclick="closeChat()"><span class="x">\u00d7</span><span><span class="t1">Close Chat</span><span class="t2">Back to league</span></span></button>`:`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()"><span class="dots"><i></i><i></i><i></i></span><span><span class="t1">Trash Talk</span><span class="t2">Open chat ›</span></span>${u?"<b>"+u+"</b>":""}</button>`;
 }
 function fmtT(ts){const d=new Date(ts),t=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});return d.toDateString()===new Date().toDateString()?t:d.toLocaleDateString([],{month:"short",day:"numeric"})+" "+t}
 function msgsHtml(){
