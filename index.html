@@ -9,9 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
 #btnrow{display:contents}#livebtn{order:1}#chatbtn{order:2}
-@media (max-width:480px){header>div:first-child{gap:6px!important;flex-wrap:nowrap!important}header h1{font-size:15px!important;line-height:1.1;min-width:0;gap:5px!important}header h1 img{width:32px;height:32px}
-header .livebtn{padding:4px 8px;font-size:11px;letter-spacing:0;white-space:nowrap}header .livebtn span{font-size:9px!important}
-header .chatbtn{padding:4px 9px;white-space:nowrap}header .chatbtn .dots{display:none}header .chatbtn .t1{font-size:12px}header .chatbtn .t2{font-size:9px}header #hb{flex:0 0 auto}}
+@media (max-width:480px){header>div:first-child{gap:6px!important;flex-wrap:nowrap!important}header h1{min-width:0;gap:5px!important}header #hb{flex:0 0 auto}.livebtn,.chatbtn{white-space:nowrap}header .chatbtn .dots{display:none}header h1{font-size:18px}header h1 img{width:34px;height:34px}}
 html:has(body.chatmode){overflow:hidden;height:100%}
 body.chatmode{height:100dvh;overflow:hidden;display:flex;flex-direction:column;overscroll-behavior:none}
 body.chatmode header{position:relative;flex:0 0 auto}body.chatmode #sub,body.chatmode #ret,body.chatmode #status{display:none}
@@ -114,7 +112,7 @@ table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block">Sim Golf League</h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block">SGL</h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
 <main id="main"></main>
 <div class="status" id="status"></div>
 <script>
