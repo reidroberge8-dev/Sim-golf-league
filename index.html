@@ -8,6 +8,11 @@
 <link rel="icon" type="image/png" href="logo-512.png">
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
+#ntf{position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));width:min(92vw,420px);z-index:80;display:flex;flex-direction:column;gap:8px}
+.ntf{background:var(--text);color:var(--bg);padding:12px 14px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.35);border-left:5px solid var(--accent);animation:ntfin .25s ease-out}
+.ntf.bad{background:var(--warn);color:#fff;border-left-color:#fff}.ntf.eagle{border-left-color:#d89a1c}.ntf.birdie{border-left-color:#2f7d4f}
+@keyframes ntfin{from{transform:translateY(-12px);opacity:0}}
+
 .chatbtn{background:var(--accent);color:var(--accent-t);border:0;border-radius:16px;padding:6px 12px;font-size:13px;font-weight:700}.chatbtn b{background:var(--warn);color:#fff;border-radius:99px;padding:1px 7px;margin-left:5px;font-size:11px}
 #msgs{max-height:55vh;overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px}
 .msg{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:14px;word-wrap:break-word}.msg small{color:var(--muted);font-size:11px;margin-left:6px}.msg.me{border-color:var(--accent)}
@@ -488,9 +493,16 @@ function chatRefresh(){
   chatBadge();
   if(tab==="chat"){const e=document.getElementById("msgs");if(e){const stick=e.scrollHeight-e.scrollTop-e.clientHeight<80;e.innerHTML=msgsHtml();if(stick)e.scrollTop=e.scrollHeight}}
 }
+function notify(text,cls,ms){
+  let box=document.getElementById("ntf");
+  if(!box){box=document.createElement("div");box.id="ntf";document.body.appendChild(box)}
+  const t=document.createElement("div");t.className="ntf "+(cls||"");t.textContent=text;t.onclick=()=>t.remove();
+  box.appendChild(t);while(box.children.length>4)box.firstChild.remove();
+  setTimeout(()=>t.remove(),ms||10000);
+}
 function announce(m){
-  if(m.k&&m.k!=="user"){const t=document.createElement("div");t.className="toast big2";t.textContent=m.t;document.body.appendChild(t);setTimeout(()=>t.remove(),5500)}
-  else if(tab!=="chat")toast("💬 "+m.n+": "+m.t.slice(0,80));
+  if(m.k&&m.k!=="user")notify(m.t,m.k,10000);
+  else notify("\ud83d\udcac "+m.n+": "+m.t,"user",10000);
 }
 window.connectChat=function(db){
   chatDb=db;
