@@ -476,7 +476,13 @@ function vChat(){
   <div class="row"><input id="cmsg" maxlength="280" placeholder="Talk your trash…" value="${esc(chatDraft)}" oninput="chatDraft=this.value" onkeydown="if(event.key==='Enter')sendChat()" style="flex:1"><button class="btn" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="sendChat()">Send</button></div>`
   :`<div class="sub">Type your name to join the trash talk.</div><div class="row"><input id="cname" maxlength="24" placeholder="Your name" onkeydown="if(event.key==='Enter')joinChat()" style="flex:1"><button class="btn" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="joinChat()">Join</button></div><div id="msgs">${msgsHtml()}</div>`;
   setTimeout(()=>{const e=document.getElementById("msgs");if(e)e.scrollTop=e.scrollHeight},0);
-  return `<div class="card"><h2>💬 Trash Talk</h2>${nameBox}</div>`;
+  const lms=S.settings.format==="match"?S.matches.filter(m=>m.status==="live"&&m.holes):[];
+  const liveHtml=lms.map(m=>{const n=m.holes.a.length,r=holesWon(m);
+    return `<div class="card" style="border-color:#e5484d"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="livenow">● LIVE NOW</span><span class="sub">${esc(cname(m)||"")}</span></div>
+    <div class="big" style="margin-top:6px">${statusText(m)}</div>
+    <div class="item" style="padding:4px 0"><b class="pa">${nh(m,"a")}</b><span>Skins <b>${r.wa}</b></span></div><div class="item" style="padding:4px 0"><b class="pb">${nh(m,"b")}</b><span>Skins <b>${r.wb}</b></span></div>
+    <details ${openSc["chat-"+m.id]?"open":""} ontoggle="openSc['chat-${m.id}']=this.open"><summary class="sub" style="cursor:pointer;margin-top:4px">View full scorecard</summary>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) · ● = handicap stroke · small number = net score</div></details></div>`}).join("");
+  return `${liveHtml}<div class="card"><h2>💬 Trash Talk</h2>${nameBox}</div>`;
 }
 function joinChat(){const v=document.getElementById("cname").value.trim().slice(0,24);if(!v)return toast("Enter a name");chatName=v;try{localStorage.setItem("golf-chat-name",v)}catch(e){}render()}
 function chatChangeName(){chatName="";try{localStorage.removeItem("golf-chat-name")}catch(e){}render()}
