@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050d1f"/><stop offset=".6" stop-color="#0b2d3d"/><stop offset="1" stop-color="#0a5a37"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#d89a1c"/></linearGradient>
+<radialGradient id="ball" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#e3ebf0"/><stop offset="1" stop-color="#9fb3bf"/></radialGradient>
+<radialGradient id="glow" cx=".5" cy=".75" r=".6"><stop offset="0" stop-color="#2dff9a" stop-opacity=".5"/><stop offset="1" stop-color="#2dff9a" stop-opacity="0"/></radialGradient>
+<clipPath id="c"><circle cx="200" cy="200" r="176"/></clipPath>
+<path id="arc" d="M 52 200 A 148 148 0 0 1 348 200"/>
+</defs>
+<circle cx="200" cy="200" r="196" fill="url(#gold)"/>
+<circle cx="200" cy="200" r="184" fill="#06121c"/>
+<circle cx="200" cy="200" r="176" fill="url(#bg)"/>
+<g clip-path="url(#c)">
+<circle cx="200" cy="300" r="200" fill="url(#glow)"/>
+<g stroke="#35ffa3" stroke-opacity=".55" stroke-width="2.2" fill="none">
+<path d="M0 290H400M0 318H400M0 352H400M0 392H400"/>
+<path d="M200 262V400M200 262L110 400M200 262L10 400M200 262L290 400M200 262L390 400"/>
+</g>
+<rect y="262" width="400" height="4" fill="#35ffa3" opacity=".85"/>
+<rect x="236" y="96" width="6" height="140" rx="3" fill="#e8f1f5"/>
+<path d="M242 96L306 120L242 144Z" fill="#ff3b4e"/>
+<ellipse cx="190" cy="292" rx="70" ry="12" fill="#000" opacity=".4"/>
+<rect x="184" y="278" width="12" height="18" rx="4" fill="url(#gold)"/>
+<circle cx="190" cy="236" r="52" fill="url(#ball)"/>
+<g fill="#9fb3bf" opacity=".6"><circle cx="170" cy="222" r="4"/><circle cx="188" cy="212" r="4"/><circle cx="208" cy="220" r="4"/><circle cx="224" cy="238" r="4"/><circle cx="162" cy="242" r="4"/><circle cx="182" cy="236" r="4"/><circle cx="202" cy="244" r="4"/><circle cx="174" cy="262" r="4"/><circle cx="196" cy="266" r="4"/><circle cx="216" cy="258" r="4"/></g>
+<circle cx="190" cy="236" r="52" fill="none" stroke="url(#gold)" stroke-width="4"/>
+</g>
+<text font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" font-size="25" letter-spacing="5" fill="#bff7dc"><textPath href="#arc" startOffset="50%" text-anchor="middle">SIM GOLF LEAGUE</textPath></text>
+<g><rect x="96" y="304" width="208" height="56" rx="10" fill="#06121c" stroke="url(#gold)" stroke-width="3"/>
+<text x="200" y="348" text-anchor="middle" font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" font-size="48" letter-spacing="8" fill="url(#gold)">SGL</text></g>
+</svg>
