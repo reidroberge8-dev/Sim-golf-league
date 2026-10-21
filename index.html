@@ -14,7 +14,7 @@
 @keyframes ntfin{from{transform:translateY(-12px);opacity:0}}
 
 .chatbtn{background:var(--accent);color:var(--accent-t);border:0;border-radius:16px;padding:6px 12px;font-size:13px;font-weight:700}.chatbtn b{background:var(--warn);color:#fff;border-radius:99px;padding:1px 7px;margin-left:5px;font-size:11px}
-#msgs{max-height:55vh;overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px}
+#msgs{height:min(50vh,420px);overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}#msgs>:first-child{margin-top:auto}
 .msg{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:14px;word-wrap:break-word}.msg small{color:var(--muted);font-size:11px;margin-left:6px}.msg.me{border-color:var(--accent)}
 .msg.birdie{border-left:4px solid #2f7d4f}.msg.eagle{border-left:4px solid #d89a1c;background:rgba(216,154,28,.12)}.msg.bad{border-left:4px solid var(--warn);background:rgba(224,70,50,.1)}
 .msg .del{float:right;border:0;background:none;color:var(--muted);font-size:14px}
@@ -456,8 +456,11 @@ let chatName="",chatSeen=0;
 try{chatName=localStorage.getItem("golf-chat-name")||"";chatSeen=+localStorage.getItem("golf-chat-seen")||0}catch(e){}
 function chatList(){return Object.entries(CH).map(([id,m])=>Object.assign({id},m)).sort((a,b)=>a.ts-b.ts)}
 function chatUnread(){return chatList().filter(m=>m.ts>chatSeen&&!(m.k==="user"&&m.n===chatName)).length}
+let prevTab="",chatFresh=false;
+function scrollMsgs(){const e=document.getElementById("msgs");if(e)e.scrollTop=e.scrollHeight}
 function chatBadge(){
   const el=document.getElementById("chatbtn");if(!el)return;
+  if(tab==="chat"&&prevTab!=="chat")chatFresh=true;prevTab=tab;
   if(tab==="chat"){const l=chatList();if(l.length){chatSeen=l[l.length-1].ts;try{localStorage.setItem("golf-chat-seen",chatSeen)}catch(e){}}}
   const u=tab==="chat"?0:chatUnread();
   el.innerHTML=tab==="chat"?"":`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()">💬 Trash Talk${u?"<b>"+u+"</b>":""}</button>`;
@@ -475,7 +478,9 @@ function vChat(){
   <div id="msgs">${msgsHtml()}</div>
   <div class="row"><input id="cmsg" maxlength="280" placeholder="Talk your trash…" value="${esc(chatDraft)}" oninput="chatDraft=this.value" onkeydown="if(event.key==='Enter')sendChat()" style="flex:1"><button class="btn" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="sendChat()">Send</button></div>`
   :`<div class="sub">Type your name to join the trash talk.</div><div class="row"><input id="cname" maxlength="24" placeholder="Your name" onkeydown="if(event.key==='Enter')joinChat()" style="flex:1"><button class="btn" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="joinChat()">Join</button></div><div id="msgs">${msgsHtml()}</div>`;
-  setTimeout(()=>{const e=document.getElementById("msgs");if(e)e.scrollTop=e.scrollHeight},0);
+  const fresh=chatFresh;chatFresh=false;
+  const go=()=>{scrollMsgs();if(fresh){const i=document.getElementById("cmsg");if(i)i.scrollIntoView({block:"end"})}};
+  setTimeout(go,0);setTimeout(scrollMsgs,200);
   const lms=S.settings.format==="match"?S.matches.filter(m=>m.status==="live"&&m.holes):[];
   const liveHtml=lms.map(m=>{const n=m.holes.a.length,r=holesWon(m);
     return `<div class="card" style="border-color:#e5484d"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="livenow">● LIVE NOW</span><span class="sub">${esc(cname(m)||"")}</span></div>
@@ -494,10 +499,12 @@ function sendChat(){
   lastSend=Date.now();const ts=Date.now();
   chatSave(ts+"-"+Math.random().toString(36).slice(2,6),{n:chatName,t:t.slice(0,280),ts,k:"user"});
   e.value="";chatDraft="";
+  chatForce=true;setTimeout(scrollMsgs,60);
 }
-function chatRefresh(){
+let chatForce=false;
+function chatRefresh(force){force=force||chatForce;if(tab==="chat")chatForce=false;
   chatBadge();
-  if(tab==="chat"){const e=document.getElementById("msgs");if(e){const stick=e.scrollHeight-e.scrollTop-e.clientHeight<80;e.innerHTML=msgsHtml();if(stick)e.scrollTop=e.scrollHeight}}
+  if(tab==="chat"){const e=document.getElementById("msgs");if(e){const stick=e.scrollHeight-e.scrollTop-e.clientHeight<80;e.innerHTML=msgsHtml();if(stick||force)e.scrollTop=e.scrollHeight}}
 }
 function notify(text,cls,ms){
   let box=document.getElementById("ntf");
