@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="logo-512.png">
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
+#btnrow{order:4;flex-basis:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap}#btnrow:not(:has(button)){display:none}
 html:has(body.chatmode){overflow:hidden;height:100%}
 body.chatmode{height:100dvh;overflow:hidden;display:flex;flex-direction:column;overscroll-behavior:none}
 body.chatmode header{position:relative;flex:0 0 auto}body.chatmode #sub,body.chatmode #ret,body.chatmode #status{display:none}
@@ -110,7 +111,7 @@ table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block">Sim Golf League</h1><span id="livebtn"></span><span id="chatbtn"></span></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block">Sim Golf League</h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
 <main id="main"></main>
 <div class="status" id="status"></div>
 <script>
