@@ -13,7 +13,11 @@
 .ntf.bad{background:var(--warn);color:#fff;border-left-color:#fff}.ntf.eagle{border-left-color:#d89a1c}.ntf.birdie{border-left-color:#2f7d4f}
 @keyframes ntfin{from{transform:translateY(12px);opacity:0}}
 
-.chatbtn{background:var(--accent);color:var(--accent-t);border:0;border-radius:16px;padding:6px 12px;font-size:13px;font-weight:700}.chatbtn b{background:var(--warn);color:#fff;border-radius:99px;padding:1px 7px;margin-left:5px;font-size:11px}
+.chatbtn{position:relative;background:var(--accent);color:var(--accent-t);border:0;border-radius:14px 14px 14px 4px;padding:6px 12px 6px 10px;line-height:1.15;text-align:left;display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.chatbtn .dots{display:inline-flex;gap:3px;background:rgba(255,255,255,.22);border-radius:10px;padding:6px 7px}.chatbtn .dots i{width:5px;height:5px;border-radius:50%;background:currentColor;animation:dt 1.2s infinite}.chatbtn .dots i:nth-child(2){animation-delay:.2s}.chatbtn .dots i:nth-child(3){animation-delay:.4s}
+@keyframes dt{0%,60%,100%{opacity:.4;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+.chatbtn .t1{display:block;font-size:13px;font-weight:800;letter-spacing:.3px}.chatbtn .t2{display:block;font-size:10px;font-weight:600;opacity:.9}
+.chatbtn b{position:absolute;top:-7px;right:-7px;background:var(--warn);color:#fff;border-radius:99px;min-width:20px;height:20px;line-height:20px;text-align:center;font-size:11px;padding:0 5px;box-shadow:0 0 0 2px var(--bg)}
 #msgs{height:min(50vh,420px);overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}#msgs>:first-child{margin-top:auto}
 .msg{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:14px;word-wrap:break-word}.msg small{color:var(--muted);font-size:11px;margin-left:6px}.msg.me{border-color:var(--accent)}
 .msg.birdie{border-left:4px solid #2f7d4f}.msg.eagle{border-left:4px solid #d89a1c;background:rgba(216,154,28,.12)}.msg.bad{border-left:4px solid var(--warn);background:rgba(224,70,50,.1)}
@@ -463,7 +467,7 @@ function chatBadge(){
   if(tab==="chat"&&prevTab!=="chat")chatFresh=true;prevTab=tab;if(tab==="chat"){const nb=document.getElementById("ntf");if(nb)nb.innerHTML=""}
   if(tab==="chat"){const l=chatList();if(l.length){chatSeen=l[l.length-1].ts;try{localStorage.setItem("golf-chat-seen",chatSeen)}catch(e){}}}
   const u=tab==="chat"?0:chatUnread();
-  el.innerHTML=tab==="chat"?"":`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()">💬 Trash Talk${u?"<b>"+u+"</b>":""}</button>`;
+  el.innerHTML=tab==="chat"?"":`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()"><span class="dots"><i></i><i></i><i></i></span><span><span class="t1">Trash Talk</span><span class="t2">Open chat ›</span></span>${u?"<b>"+u+"</b>":""}</button>`;
 }
 function fmtT(ts){const d=new Date(ts),t=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});return d.toDateString()===new Date().toDateString()?t:d.toLocaleDateString([],{month:"short",day:"numeric"})+" "+t}
 function msgsHtml(){
