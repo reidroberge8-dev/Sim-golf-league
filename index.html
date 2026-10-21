@@ -8,10 +8,10 @@
 <link rel="icon" type="image/png" href="logo-512.png">
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
-#ntf{position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));width:min(92vw,420px);z-index:80;display:flex;flex-direction:column;gap:8px}
+#ntf{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(92vw,420px);z-index:80;display:flex;flex-direction:column;gap:8px}
 .ntf{background:var(--text);color:var(--bg);padding:12px 14px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.35);border-left:5px solid var(--accent);animation:ntfin .25s ease-out}
 .ntf.bad{background:var(--warn);color:#fff;border-left-color:#fff}.ntf.eagle{border-left-color:#d89a1c}.ntf.birdie{border-left-color:#2f7d4f}
-@keyframes ntfin{from{transform:translateY(-12px);opacity:0}}
+@keyframes ntfin{from{transform:translateY(12px);opacity:0}}
 
 .chatbtn{background:var(--accent);color:var(--accent-t);border:0;border-radius:16px;padding:6px 12px;font-size:13px;font-weight:700}.chatbtn b{background:var(--warn);color:#fff;border-radius:99px;padding:1px 7px;margin-left:5px;font-size:11px}
 #msgs{height:min(50vh,420px);overflow-y:auto;margin:8px 0;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}#msgs>:first-child{margin-top:auto}
@@ -460,7 +460,7 @@ let prevTab="",chatFresh=false;
 function scrollMsgs(){const e=document.getElementById("msgs");if(e)e.scrollTop=e.scrollHeight}
 function chatBadge(){
   const el=document.getElementById("chatbtn");if(!el)return;
-  if(tab==="chat"&&prevTab!=="chat")chatFresh=true;prevTab=tab;
+  if(tab==="chat"&&prevTab!=="chat")chatFresh=true;prevTab=tab;if(tab==="chat"){const nb=document.getElementById("ntf");if(nb)nb.innerHTML=""}
   if(tab==="chat"){const l=chatList();if(l.length){chatSeen=l[l.length-1].ts;try{localStorage.setItem("golf-chat-seen",chatSeen)}catch(e){}}}
   const u=tab==="chat"?0:chatUnread();
   el.innerHTML=tab==="chat"?"":`<button class="chatbtn" onclick="tab='chat';menuOpen=false;render()">💬 Trash Talk${u?"<b>"+u+"</b>":""}</button>`;
@@ -514,6 +514,7 @@ function notify(text,cls,ms){
   setTimeout(()=>t.remove(),ms||10000);
 }
 function announce(m){
+  if(tab==="chat")return;
   if(m.k&&m.k!=="user")notify(m.t,m.k,10000);
   else notify("\ud83d\udcac "+m.n+": "+m.t,"user",10000);
 }
