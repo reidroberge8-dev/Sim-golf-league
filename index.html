@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
 #btnrow{display:contents}#livebtn{order:1}#chatbtn{order:2}
-@media (max-width:480px){header>div:first-child{gap:6px!important;flex-wrap:nowrap!important}header h1{min-width:0;gap:5px!important}header #hb{flex:0 0 auto}.livebtn,.chatbtn{white-space:nowrap}header .chatbtn .dots{display:none}#livebtn{flex:0 1 118px;min-width:0}#chatbtn{flex:0 1 auto;min-width:0}#chatbtn{margin-left:auto}header #hb{margin-left:0!important}#livebtn:not(:empty){margin-left:auto}#livebtn:not(:empty)+#chatbtn{margin-left:0}#livebtn:empty,#chatbtn:empty{display:none}#livebtn .livebtn,#chatbtn .chatbtn{width:100%;box-sizing:border-box;justify-content:center;text-align:center;min-height:42px;display:flex;align-items:center}#chatbtn .chatbtn{width:auto;min-height:34px;padding:3px 10px}#chatbtn .chatbtn .t1{font-size:12px}#chatbtn .chatbtn .t2{font-size:9px}#livebtn .livebtn{flex-direction:column;justify-content:center}#chatbtn .chatbtn{gap:6px}header h1{font-size:18px}header h1 img{width:34px;height:34px}}
+@media (max-width:480px){header>div:first-child{gap:6px!important;flex-wrap:nowrap!important}header h1{min-width:0;gap:5px!important}header #hb{flex:0 0 auto}.livebtn,.chatbtn{white-space:nowrap}header .chatbtn .dots{display:none}#livebtn{flex:0 1 118px;min-width:0}#chatbtn{flex:0 1 auto;min-width:0}#chatbtn{margin-left:auto}header #hb{margin-left:0!important}#livebtn:not(:empty){margin-left:auto}#livebtn:not(:empty)+#chatbtn{margin-left:0}#livebtn:empty,#chatbtn:empty{display:none}#livebtn .livebtn,#chatbtn .chatbtn{width:100%;box-sizing:border-box;justify-content:center;text-align:center;min-height:42px;display:flex;align-items:center}#chatbtn .chatbtn{width:auto;min-height:34px;padding:3px 10px}#chatbtn .chatbtn .t1{font-size:12px}#chatbtn .chatbtn .t2{font-size:9px}#livebtn .livebtn{flex-direction:column;justify-content:center}#chatbtn .chatbtn{gap:6px}header h1{font-size:14px;line-height:1.1}header h1 img{width:30px;height:30px}header .livebtn{padding:4px 7px;font-size:11px;letter-spacing:0}header .livebtn span{font-size:9px!important}#livebtn{flex:0 1 auto}#livebtn .livebtn{min-height:36px}header #hb{padding-left:0;padding-right:0;width:36px}}
 html:has(body.chatmode){overflow:hidden;height:100%}
 body.chatmode{height:100dvh;overflow:hidden;display:flex;flex-direction:column;overscroll-behavior:none}
 body.chatmode header{position:relative;flex:0 0 auto}body.chatmode #sub,body.chatmode #ret,body.chatmode #status{display:none}
@@ -113,7 +113,7 @@ table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block">SGL</h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block"><span>SGL - Season 1</span></h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
 <main id="main"></main>
 <div class="status" id="status"></div>
 <script>
@@ -240,7 +240,7 @@ function vStandings(){
   const st=standings(),SK=skinsMap(),P=t=>t.w*10+t.t*5+(SK[t.id]||0);if(S.settings.format==="match")st.sort((a,b)=>P(b)-P(a)||b.w-a.w);
   if(st.length&&S.settings.format!=="match")return vStandingsAlt(st);
   if(!st.length)return `<div class="card empty">No players yet. Add some in the Players tab.</div>`;
-  return `<div class="card"><h2>League Standings</h2><div class="wrap"><table>
+  return `<div class="card"><h2>Season 1 Standings</h2><div class="wrap"><table>
   <tr><th></th><th class="l">Player</th><th>Pts</th><th>W</th><th>L</th><th>T</th><th>Skins</th><th>Avg</th><th>Best</th><th>Rds</th></tr>
   ${st.map((t,i)=>`<tr><td class="rank">${i+1}</td><td class="l">${nm(t.id)}</td><td class="pts">${P(t)}</td><td>${t.w}</td><td>${t.l}</td><td>${t.t}</td><td>${SK[t.id]||0}</td><td>${t.rounds?(t.sum/t.rounds).toFixed(1):"–"}</td><td>${fmtTop(t.best)}</td><td>${t.rounds}</td></tr>`).join("")}
   </table></div><div class="sub" style="margin-top:8px">Points: 10 per win, 5 per tie, 1 per skin. Skins = holes won outright on net score (hole-by-hole matches).</div></div>`;
