@@ -358,7 +358,10 @@ function vWeekly(title){
     const n=m.holes?m.holes.a.length:0;
     const det=m.holes?`<details ${openSc[m.id]?"open":""} ontoggle="openSc['${m.id}']=this.open"><summary class="scbtn">View scorecard</summary>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) · ● = handicap stroke (hole not scored yet) · small number = net score on a stroke hole<br>${MARKKEY}</div>${canEdit&&!isLive?`<button class="btn alt" onclick="editCard('${m.id}')">Edit scorecard</button>`:""}</details>`:"";
     return `<div class="card" style="margin:8px 0 0;${isLive?"border-color:#e5484d":""}"><div style="display:flex;justify-content:space-between;align-items:center"><div class="big" style="font-size:16px">${res}</div>${title&&canEdit?`<button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button>`:""}</div><div class="sub">${esc(cname(m)||"No course")}</div>${pLine("a")}${pLine("b")}${det}</div>`};
-  return `<div><h2 style="margin:4px 0 0;font-size:16px">${title||"Match Results"}</h2>${keys.map(k=>{const ms=G[k].sort((a,b)=>a.ts-b.ts);return `<div class="sub" style="margin:12px 0 0;font-weight:700">${esc(k)}${G[k][0].week?" · "+G[k][0].date:""}</div>`+ms.map(blk).join("")}).join("")}</div>`;
+  const asc=[...S.matches].sort((x,y)=>(x.date||"").localeCompare(y.date||"")||(x.ts||0)-(y.ts||0));
+  const num=m=>asc.indexOf(m)+1;
+  const ordered=[...done].sort((x,y)=>(y.date||"").localeCompare(x.date||"")||(y.ts||0)-(x.ts||0));
+  return `<div><h2 style="margin:4px 0 0;font-size:16px">${title||"Match Results"}</h2>${ordered.map(m=>`<div class="sub" style="margin:12px 0 0;font-weight:700"><span style="color:var(--accent)">Match ${num(m)}</span> · ${esc(m.week?"Week "+m.week+" · ":"")}${esc(m.date||"")}</div>`+blk(m)).join("")}</div>`;
 }
 function vWeeklyOld(){
   const done=S.matches.filter(m=>m.status!=="live");
