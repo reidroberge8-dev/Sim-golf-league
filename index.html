@@ -336,7 +336,7 @@ function addMatch(){
 function delMatch(id){ask("Delete this match?",()=>mut(()=>S.matches=S.matches.filter(m=>m.id!==id)))}
 
 const openSc={};
-function matchResult(m){let d=0;const n=m.holes.a.length;for(let i=0;i<n;i++){const x=m.holes.a[i],y=m.holes.b[i];if(x==null||y==null)continue;const nx=x-strokesFor(m,m.a,i),ny=y-strokesFor(m,m.b,i);if(nx<ny)d++;else if(ny<nx)d--;const rem=n-(i+1);if(Math.abs(d)>rem)return{w:d>0?"a":"b",t:Math.abs(d)+"&"+rem}}return{w:d>0?"a":d<0?"b":null,t:d===0?"AS":Math.abs(d)+" UP"}}
+function matchResult(m){let d=0;const n=m.holes.a.length;for(let i=0;i<n;i++){const x=m.holes.a[i],y=m.holes.b[i];if(x==null||y==null)continue;const nx=x-strokesFor(m,m.a,i),ny=y-strokesFor(m,m.b,i);if(nx<ny)d++;else if(ny<nx)d--;const rem=n-(i+1);if(Math.abs(d)>rem)return{w:d>0?"a":"b",t:rem===0?Math.abs(d)+" UP":Math.abs(d)+"&"+rem}}return{w:d>0?"a":d<0?"b":null,t:d===0?"AS":Math.abs(d)+" UP"}}
 function netTot(m,s){if(!m.holes)return net(m,s);return (s==="a"?m.sa:m.sb)-hcpOf(m,s)}
 function editCard(id){live=id;editFinal=true;curHole=0;tab="matches";render();window.scrollTo(0,0)}
 function exitCard(){const was=editFinal;live=null;editFinal=false;if(was)tab="standings";render()}
