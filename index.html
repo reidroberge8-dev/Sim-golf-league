@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="logo-512.png">
 <meta name="apple-mobile-web-app-title" content="Sim Golf">
 <style>
+.seasons{display:flex;gap:6px;margin:0 0 10px}.seasons button{flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700;font-size:14px}.seasons button.on{background:var(--accent);color:var(--accent-t);border-color:var(--accent)}
 details>summary.scbtn{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 6px;padding:11px 14px;background:var(--accent);color:var(--accent-t);font-weight:700;font-size:15px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,.2);user-select:none;-webkit-tap-highlight-color:transparent}
 details>summary.scbtn::-webkit-details-marker{display:none}details>summary.scbtn::after{content:"▾";font-size:16px;transition:transform .2s}details[open]>summary.scbtn::after{transform:rotate(180deg)}details[open]>summary.scbtn{background:#6b7280}details>summary.scbtn:active{transform:scale(.98)}
 .pillbtn{white-space:nowrap;background:var(--accent);color:var(--accent-t);font-weight:700;font-size:12px;padding:6px 11px;border-radius:99px;box-shadow:0 2px 4px rgba(0,0,0,.2)}
@@ -117,7 +118,7 @@ table.sc sup{position:absolute;top:0;right:0;font-size:8px;margin:0}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block"><span>SGL - Season 1</span></h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
+<header><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button id="hb" class="burger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">☰</button><h1 style="display:flex;align-items:center;gap:8px"><img src="logo.png" alt="SGL" width="40" height="40" style="display:block"><span id="stitle">SGL - <span style="white-space:nowrap">Season 1</span></span></h1><div id="btnrow"><span id="livebtn"></span><span id="chatbtn"></span></div></div><div class="sub" id="sub"></div><div id="ret"></div><nav id="nav"></nav></header>
 <main id="main"></main>
 <div class="status" id="status"></div>
 <script>
@@ -184,10 +185,22 @@ function unlock(){
 function lock(){canEdit=false;try{localStorage.removeItem("golf-pin")}catch(e){}tab="standings";live=null;editFinal=false;menuOpen=false;render()}
 function mut(fn){fn();persist();render()}
 
+/* ---------- seasons ---------- */
+const SEASONS=[{n:1,start:"2000-01-01",end:"2026-12-31",label:"Now \u2013 Dec 31, 2026"},{n:2,start:"2027-01-01",end:"2027-02-28",label:"Jan \u2013 Feb 2027"},{n:3,start:"2027-03-01",end:"2027-04-30",label:"Mar \u2013 Apr 2027"}];
+function seasonOf(d){d=d||today();for(const x of SEASONS)if(d>=x.start&&d<=x.end)return x.n;return d<SEASONS[0].start?1:SEASONS[SEASONS.length-1].n}
+function seasonState(n){const t=today(),x=SEASONS[n-1];return t<x.start?"Upcoming":t>x.end?"Completed":"Current"}
+let selSeason=seasonOf(today());
+const inSel=m=>seasonOf(m.date)===selSeason;
+const SM=()=>S.matches.filter(inSel);
+function seasonBar(){
+  const x=SEASONS[selSeason-1],st=seasonState(selSeason);
+  return `<div class="seasons">${SEASONS.map(e=>`<button class="${e.n===selSeason?"on":""}" onclick="selSeason=${e.n};render()">Season ${e.n}</button>`).join("")}</div><div class="sub" style="margin:-4px 2px 10px">Season ${x.n} \u00b7 ${x.label} \u00b7 <b>${st}</b></div>`;
+}
+
 /* ---------- stats ---------- */
 function allRounds(){
   const r=S.rounds.map(x=>({player:x.player,gross:x.score,date:x.date,week:x.week}));
-  S.matches.filter(m=>m.status!=="live").forEach(m=>{r.push({player:m.a,gross:m.sa,date:m.date});r.push({player:m.b,gross:m.sb,date:m.date})});
+  SM().filter(m=>m.status!=="live").forEach(m=>{r.push({player:m.a,gross:m.sa,date:m.date});r.push({player:m.b,gross:m.sb,date:m.date})});
   return r;
 }
 const hcpOf=(m,side)=>{const v=side==="a"?m.ha:m.hb;if(v!=null)return Number(v)||0;const p=pl(side==="a"?m.a:m.b);return Number(p&&p.hcp)||0};
@@ -218,7 +231,7 @@ function standings(){
   if(S.settings.format==="points")return pointsStandings();
   const T={};
   S.players.forEach(p=>T[p.id]={id:p.id,w:0,l:0,t:0,pts:0,rounds:0,sum:0,best:null});
-  S.matches.forEach(m=>{
+  SM().forEach(m=>{
     const a=T[m.a],b=T[m.b];if(!a||!b||m.status==="live")return;
     const rs=mres(m),c=S.settings;
     if(rs<0){a.w++;b.l++;a.pts+=c.win;b.pts+=c.loss}
@@ -244,7 +257,7 @@ function vStandings(){
   const st=standings(),SK=skinsMap(),P=t=>t.w*10+t.t*5+(SK[t.id]||0);if(S.settings.format==="match")st.sort((a,b)=>P(b)-P(a)||b.w-a.w);
   if(st.length&&S.settings.format!=="match")return vStandingsAlt(st);
   if(!st.length)return `<div class="card empty">No players yet. Add some in the Players tab.</div>`;
-  return `<div class="card"><h2>Season 1 Standings</h2><div class="wrap"><table>
+  return seasonBar()+`<div class="card"><h2>Season ${selSeason} Standings</h2><div class="wrap"><table>
   <tr><th></th><th class="l">Player</th><th>Pts</th><th>W</th><th>L</th><th>T</th><th>Skins</th><th>Avg</th><th>Best</th><th>Rds</th></tr>
   ${st.map((t,i)=>`<tr><td class="rank">${i+1}</td><td class="l">${nm(t.id)}</td><td class="pts">${P(t)}</td><td>${t.w}</td><td>${t.l}</td><td>${t.t}</td><td>${SK[t.id]||0}</td><td>${t.rounds?(t.sum/t.rounds).toFixed(1):"–"}</td><td>${fmtTop(t.best)}</td><td>${t.rounds}</td></tr>`).join("")}
   </table></div><div class="sub" style="margin-top:8px">Points: 10 per win, 5 per tie, 1 per skin. Skins = holes won outright on net score (hole-by-hole matches).</div></div>`;
@@ -255,7 +268,7 @@ const course=id=>S.courses.find(c=>c.id===id);
 const cname=m=>course(m.course)?course(m.course).name:(m.course||"");
 function strokesFor(m,pid,i){const ha=hcpOf(m,"a"),hb=hcpOf(m,"b"),h=Math.max(0,(pid===m.a?ha:hb)-Math.min(ha,hb)),n=m.holes.a.length,eff=n===18?h:Math.round(h/2),c=course(m.course),si=(c&&c.si)||Array.from({length:18},(_,k)=>k+1);const rank=si.slice(0,n).map((s,k)=>[s,k]).sort((a,b)=>a[0]-b[0]).findIndex(x=>x[1]===i);return Math.floor(eff/n)+(rank<eff%n?1:0)}
 function holesWon(m){let wa=0,wb=0,n=0;m.holes.a.forEach((x,i)=>{const y=m.holes.b[i];if(x!=null&&y!=null){n++;const nx=x-strokesFor(m,m.a,i),ny=y-strokesFor(m,m.b,i);if(nx<ny)wa++;else if(ny<nx)wb++}});return{wa,wb,n}}
-function skinsMap(){const K={};S.matches.forEach(m=>{if(!m.holes||m.status==="live")return;const r=holesWon(m);K[m.a]=(K[m.a]||0)+r.wa;K[m.b]=(K[m.b]||0)+r.wb});return K}
+function skinsMap(){const K={};SM().forEach(m=>{if(!m.holes||m.status==="live")return;const r=holesWon(m);K[m.a]=(K[m.a]||0)+r.wa;K[m.b]=(K[m.b]||0)+r.wb});return K}
 function mres(m){if(m.holes){const r=holesWon(m);return r.wa>r.wb?-1:r.wb>r.wa?1:0}const na=net(m,"a"),nb=net(m,"b");return na<nb?-1:nb<na?1:0}
 function statusText(m){const r=holesWon(m),d=r.wa-r.wb,who=nm(d>0?m.a:m.b);if(!r.n)return "Not started";if(m.status==="live")return d===0?"All square thru "+r.n:`${who} ${Math.abs(d)} UP thru ${r.n}`;const mr=matchResult(m);return mr.w?`${nm(mr.w==="a"?m.a:m.b)} won ${mr.t}`:"AS"}
 const scoreName=d=>d<=-2?"Eagle":d===-1?"Birdie":d===0?"Par":d===1?"Bogey":"+"+d;
@@ -342,8 +355,8 @@ function editCard(id){live=id;editFinal=true;curHole=0;tab="matches";render();wi
 function exitCard(){const was=editFinal;live=null;editFinal=false;if(was)tab="standings";render()}
 function setMatchCourse(id,v){const m=S.matches.find(x=>x.id===id);if(m){m.course=v;persist();render()}}
 function vWeekly(title){
-  const done=S.matches.filter(m=>title?m.status!=="live":true);
-  if(!done.length)return "";
+  const done=SM().filter(m=>title?m.status!=="live":true);
+  if(!done.length)return title?"":`<div><h2 style="margin:4px 0 0;font-size:16px">Match Results</h2><div class="card empty" style="margin-top:8px">No matches in Season ${selSeason} yet.</div></div>`;
   const G={};
   done.forEach(m=>{const k=m.week?"Week "+m.week:m.date;(G[k]=G[k]||[]).push(m)});
   const keys=Object.keys(G).sort((a,b)=>{const A=G[a][0],B=G[b][0];return A.week&&B.week?(parseFloat(B.week)||0)-(parseFloat(A.week)||0):B.date.localeCompare(A.date)});
@@ -358,7 +371,7 @@ function vWeekly(title){
     const n=m.holes?m.holes.a.length:0;
     const det=m.holes?`<details ${openSc[m.id]?"open":""} ontoggle="openSc['${m.id}']=this.open"><summary class="scbtn">View scorecard</summary>${holeTbl(m,0,9)}${n>9?holeTbl(m,9,18):""}<div class="sub" style="margin:6px 0">Green = hole won (net) · ● = handicap stroke (hole not scored yet) · small number = net score on a stroke hole<br>${MARKKEY}</div>${canEdit&&!isLive?`<button class="btn alt" onclick="editCard('${m.id}')">Edit scorecard</button>`:""}</details>`:"";
     return `<div class="card" style="margin:8px 0 0;${isLive?"border-color:#e5484d":""}"><div style="display:flex;justify-content:space-between;align-items:center"><div class="big" style="font-size:16px">${res}</div>${title&&canEdit?`<button class="x" onclick="delMatch('${m.id}')" aria-label="Delete">✕</button>`:""}</div><div class="sub">${esc(cname(m)||"No course")}</div>${pLine("a")}${pLine("b")}${det}</div>`};
-  const asc=[...S.matches].sort((x,y)=>(x.date||"").localeCompare(y.date||"")||(x.ts||0)-(y.ts||0));
+  const asc=[...SM()].sort((x,y)=>(x.date||"").localeCompare(y.date||"")||(x.ts||0)-(y.ts||0));
   const num=m=>asc.indexOf(m)+1;
   const ordered=[...done].sort((x,y)=>(y.date||"").localeCompare(x.date||"")||(y.ts||0)-(x.ts||0));
   return `<div><h2 style="margin:4px 0 0;font-size:16px">${title||"Match Results"}</h2>${ordered.map(m=>`<div class="sub" style="margin:12px 0 0;font-weight:700"><span style="color:var(--accent)">Match ${num(m)}</span> · ${esc(m.week?"Week "+m.week+" · ":"")}${esc(m.date||"")}</div>`+blk(m)).join("")}</div>`;
@@ -475,7 +488,7 @@ function render(keepFocus){
   document.title=S.settings.name;
   document.getElementById("nav").className=menuOpen?"open":"";document.getElementById("hb").setAttribute("aria-expanded",menuOpen?"true":"false");
   document.getElementById("nav").innerHTML=TABS.filter(([k])=>k==="standings"||k==="chat"||(canEdit&&(k!=="matches"||S.settings.format==="match"))).map(([k,l])=>`<button class="${k===tab?"on":""}" onclick="tab='${k}';menuOpen=false;render()">${l}</button>`).join("")+`<button onclick="${canEdit?"lock()":"unlock()"}">${canEdit?"Lock scorekeeper mode":"Scorekeeper login"}</button>`;
-  chatBadge();document.body.classList.toggle("chatmode",tab==="chat");
+  chatBadge();document.body.classList.toggle("chatmode",tab==="chat");{const st=document.getElementById("stitle");if(st)st.innerHTML="SGL - <span style=\"white-space:nowrap\">Season "+selSeason+"</span>"}
   const a=document.activeElement;
   if(keepFocus&&a&&a.tagName==="INPUT")return;
   document.getElementById("main").innerHTML={standings:()=>vStandings()+(S.settings.format!=="match"?(canEdit?logRoundCard():""):vWeekly()),matches:vMatches,live:vLive,players:vPlayers,chat:vChat}[tab]();
